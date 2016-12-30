@@ -3,7 +3,7 @@ import React from 'react';
 class Clue extends React.Component {
   render() {
     return (
-      <h2>Clue</h2>
+      <h2>{this.props.difficulty * 100}</h2>
     )
   }
 }
