@@ -14,8 +14,6 @@ class App extends React.Component {
 	}
 	customMethod(param) {
 	}
-}
-
 
   render() {
     return (
@@ -24,6 +22,9 @@ class App extends React.Component {
       </div>
     )
   }
+}
+
+
 
 
 
