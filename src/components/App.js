@@ -20,10 +20,12 @@ class App extends React.Component {
 		return (
 			<div className="perilious-trivia">
 				<GameBoard />
+				{/*
 				<ScoreBoard />
 				<Buzzer />
 				<Timer />
 				<StatusBar />
+				*/}
 			</div>
 		)
 	}
