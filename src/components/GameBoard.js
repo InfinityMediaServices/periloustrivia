@@ -15,7 +15,7 @@ class GameBoard extends React.Component {
 					return (
 						<Clue 
 							key={clueNum} 
-							difficulty={clueNum} 
+							difficulty={parseInt(clueNum)} 
 							clue={cat.clues[clueNum].clue}
 						/>
 					)
