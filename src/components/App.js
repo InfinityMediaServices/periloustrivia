@@ -36,7 +36,7 @@ class App extends React.Component {
 		// 		game: JSON.parse(localStorageRef)
 		// 	});
 		// }
-		// this.loadSamples();
+		this.loadSamples();
 
 	}
 
