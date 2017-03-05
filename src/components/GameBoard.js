@@ -17,6 +17,7 @@ class GameBoard extends React.Component {
 							key={clueNum} 
 							difficulty={parseInt(clueNum, 10)} 
 							clue={cat.clues[clueNum].clue}
+							selectClue={this.props.selectClue}
 						/>
 					)
 				})}
