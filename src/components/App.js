@@ -12,13 +12,37 @@ class App extends React.Component {
 	constructor() {
 		super();
 		this.customMethod = this.customMethod.bind(this);
+		this.setHelper = this.setHelper.bind(this);
+		this.setHelpers = this.setHelpers.bind(this);
+		this.setPhase = this.setPhase.bind(this);
+		this.selectClue = this.selectClue.bind(this);
 	}
 	customMethod(param) {
 	}
-	
-	state = {
-		game: {}
+	setHelper(name, state) {
+		this.state.game.phase['is' + name[0].toUpperCase() + name.slice(1)] = state;
+		// stuff
 	}
+	setHelpers(param) {
+		const names = this.phase.possibleNames;
+		for (var i = 0; i < names.length; i++) {
+			this.setHelper(names[i], this.phase.name === names[i]);
+		}
+	}
+	setPhase(phase) {
+		console.log('clicked here');
+		console.log(this);
+		this.state.game.phase.name = phase;
+		this.setHelper(phase, true);
+		return;
+	}
+	selectClue(key) {
+		this.setPhase('cluePresentation');
+	}
+	
+
+
+	state = {game: {} }
 
 	componentWillMount() {
 		// this runs right before the <App> is rendered
@@ -60,7 +84,7 @@ class App extends React.Component {
 			{/*
 			*/}
 				<div className="temp">{this.props.params.gameId}</div>
-				<GameBoard game={this.state.game} />
+				<GameBoard game={this.state.game} selectClue={this.selectClue} />
 				{/*
 				<ScoreBoard />
 				<Buzzer />
