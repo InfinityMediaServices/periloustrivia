@@ -1,7 +1,8 @@
 import React from 'react';
 import base from '../base';
 
-import GameBoard from './GameBoard';
+import GameBoard from './GameBoard'; 
+import PlayBoard from './PlayBoard'; 
 import sampleGame from '../sample-game';
 // import ScoreBoard from './ScoreBoard';
 // import Buzzer from './Buzzer';
@@ -32,8 +33,12 @@ class App extends React.Component {
 	setPhase(phase) {
 		console.log('clicked here');
 		console.log(this);
+
+	    // take a copy of our state
+	    const game = {...this.state.game};
 		this.state.game.phase.name = phase;
 		this.setHelper(phase, true);
+	    this.setState({ game });
 		return;
 	}
 	selectClue(key) {
@@ -83,8 +88,11 @@ class App extends React.Component {
 			<div className="perilious-trivia">
 			{/*
 			*/}
-				<div className="temp">{this.props.params.gameId}</div>
+				<div className="temp">
+					{this.props.params.gameId}
+				</div>
 				<GameBoard game={this.state.game} selectClue={this.selectClue} />
+				<PlayBoard game={this.state.game} />
 				{/*
 				<ScoreBoard />
 				<Buzzer />
