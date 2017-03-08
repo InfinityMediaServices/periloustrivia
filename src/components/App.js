@@ -105,6 +105,7 @@ class App extends React.Component {
 		this.setState({
 			game: game
 		});
+/*
 
 		newClues = clues.map(clue => {
 			Object.keys(clue.q).forEach(key =>{
@@ -119,6 +120,7 @@ class App extends React.Component {
 			return clue;
 		});
 		newClues = JSON.stringify(newClues);
+*/
 		console.log(newClues);
 
 	};
