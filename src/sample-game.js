@@ -32,16 +32,16 @@ const sampleGame = {
 	},
 	round: 0,
 	rounds: [
-		0: { 
+		{ 
 			cats:[]
 		},
-		1: { 
+		{ 
 			cats:[]
 		},
-		2: { 
+		{ 
 			cats:[]
 		},
-		3: { 
+		{ 
 			cats:[]
 		},
 	],

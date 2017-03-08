@@ -27,14 +27,14 @@ class GameBoard extends React.Component {
 		)
 	}
 	render() {
-		console.log(this.props);
+		// console.log(this.props);
 		if(!this.props.game.cats){
 			return null;
 		}
 		const catIds = Object.keys(this.props.game.cats);
 		return (
 			<div className="game-board">
-        {catIds.map(this.renderCategory)}
+		        {catIds.map(this.renderCategory)}
 			</div>
 		)
 	}

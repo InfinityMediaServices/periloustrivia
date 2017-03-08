@@ -7,11 +7,13 @@ class Clue extends React.Component {
 				<button onClick={() => this.props.selectClue(this.props.cat, this.props.clueID)}>
 					{this.props.difficulty * 100}
 				</button>
+				{/*
 				<div className="clue-view">
 					<div className="clue-text">
 						{this.props.clue}
 					</div>
 				</div>
+				*/}
 			</div>
 		)
 	}

@@ -4,6 +4,7 @@ import base from '../base';
 import GameBoard from './GameBoard'; 
 import PlayBoard from './PlayBoard'; 
 import sampleGame from '../sample-game';
+import sampleClues from '../clues';
 // import ScoreBoard from './ScoreBoard';
 // import Buzzer from './Buzzer';
 // import Timer from './Timer';
@@ -32,10 +33,6 @@ class App extends React.Component {
 		}
 	}
 	setPhase(phase) {
-		console.log('clicked here');
-		console.log(this);
-
-	    // take a copy of our state
 	    const game = {...this.state.game};
 		game.phase.name = phase;
 		this.setHelper(phase, true);
@@ -43,8 +40,6 @@ class App extends React.Component {
 		return;
 	}
 	selectClue(cat, clue) {
-		console.log('cat: ', cat);
-		console.log('clue: ', clue);
 	    const game = {...this.state.game};
 	    game.currentClue = {
 	    	cat: cat,
@@ -53,7 +48,6 @@ class App extends React.Component {
 		this.setPhase('cluePresentation');
 	    this.setState({ game });
 	}
-
 	state = {
 		game: {} 
 	}
@@ -74,7 +68,9 @@ class App extends React.Component {
 		// 		game: JSON.parse(localStorageRef)
 		// 	});
 		// }
-		this.loadSamples();
+		// if(!this.state.game){
+		// }
+			this.loadSamples();
 
 	}
 
@@ -87,9 +83,44 @@ class App extends React.Component {
 	// }
 
 	loadSamples = () => {
+		console.log('sampleClues: ', sampleClues);
+		const game = sampleGame;
+		const clues = sampleClues;
+		var newClues = clues;
+		for (var round = 1; round <= 3; round++) {
+			for (var cat = 1; cat <= 6; cat++) {
+
+				game.rounds[round].cats[cat] = {
+					catTitle: `Category ${cat}`,
+					clues: {
+					}
+				};
+
+				for (var clue = 1; clue <= 5; clue++) {
+					game.rounds[round].cats[cat].clues[clue] = clues[Math.floor(Math.random()*clues.length)];
+				}
+			}
+		}
+		game.cats = game.rounds[1].cats;
 		this.setState({
-			game: sampleGame
+			game: game
 		});
+
+		newClues = clues.map(clue => {
+			Object.keys(clue.q).forEach(key =>{
+				key = parseInt(key, 10);
+				if (clue.q[key] === clue.cq){
+					clue.cq = key;
+				}
+			});
+			if(typeof clue.cq !== 'number'){
+				console.log('mismatch clue: ', clue);
+			}
+			return clue;
+		});
+		newClues = JSON.stringify(newClues);
+		console.log(newClues);
+
 	};
 
 	render() {
