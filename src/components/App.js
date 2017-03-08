@@ -21,8 +21,9 @@ class App extends React.Component {
 	customMethod(param) {
 	}
 	setHelper(name, state) {
-		this.state.game.phase['is' + name[0].toUpperCase() + name.slice(1)] = state;
-		// stuff
+	    const game = {...this.state.game};
+		game.phase['is' + name[0].toUpperCase() + name.slice(1)] = state;
+	    this.setState({ game });
 	}
 	setHelpers(param) {
 		const names = this.phase.possibleNames;
@@ -36,18 +37,26 @@ class App extends React.Component {
 
 	    // take a copy of our state
 	    const game = {...this.state.game};
-		this.state.game.phase.name = phase;
+		game.phase.name = phase;
 		this.setHelper(phase, true);
 	    this.setState({ game });
 		return;
 	}
-	selectClue(key) {
+	selectClue(cat, clue) {
+		console.log('cat: ', cat);
+		console.log('clue: ', clue);
+	    const game = {...this.state.game};
+	    game.currentClue = {
+	    	cat: cat,
+	    	clue: clue
+	    };
 		this.setPhase('cluePresentation');
+	    this.setState({ game });
 	}
-	
 
-
-	state = {game: {} }
+	state = {
+		game: {} 
+	}
 
 	componentWillMount() {
 		// this runs right before the <App> is rendered

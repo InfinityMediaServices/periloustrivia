@@ -11,12 +11,14 @@ class GameBoard extends React.Component {
 		return (
 			<div key={key} className="category cat cat-{key}">
 				<div className="cat-title">{cat.catTitle}</div>
-				{Object.keys(cat.clues).map((clueNum) => {
+				{Object.keys(cat.clues).map((clueID) => {
 					return (
 						<Clue 
-							key={clueNum} 
-							difficulty={parseInt(clueNum, 10)} 
-							clue={cat.clues[clueNum].clue}
+							key={clueID} 
+							clueID={clueID}
+							difficulty={parseInt(clueID, 10)} 
+							cat={key}
+							clue={cat.clues[clueID].clue}
 							selectClue={this.props.selectClue}
 						/>
 					)

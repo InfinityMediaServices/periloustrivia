@@ -8,14 +8,16 @@ class PlayBoard extends React.Component {
 	customMethod(key) {
 	}
 	render() {
-		if(!this.props.game.phase){
+		if(!this.props.game || !this.props.game.phase){
 			return null;
 		}
-		console.log('this.props.game.phase: ', this.props.game.phase);
-		if(this.props.game.phase.isCluePresentation){	
+		const game = this.props.game;
+		const phase = game.phase;
+
+		if(phase.isCluePresentation){	
 			return (
 				<div className="play-board">
-					<h2>hello</h2>
+					<h2>{game.cats[game.currentClue.cat].clues[game.currentClue.clue].clue}</h2>
 				</div>
 			)
 		} else {
