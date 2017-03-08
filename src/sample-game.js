@@ -1,6 +1,6 @@
 // This is just some sample data so you don't have to think of your own!
 const sampleGame = {
-	cats: {},
+	cats: [],
 	phase: {
 		possibleNames:[
 			'roundIntro',
@@ -31,6 +31,24 @@ const sampleGame = {
 
 	},
 	round: 0,
+	rounds: [
+		0: { 
+			cats:[]
+		},
+		1: { 
+			cats:[]
+		},
+		2: { 
+			cats:[]
+		},
+		3: { 
+			cats:[]
+		},
+	],
+	currentClue: {
+		cat:0,
+		clue:0,
+	},
 	// round: 1, // single 
 	// round: 2, // double
 	// round: 3, // final
