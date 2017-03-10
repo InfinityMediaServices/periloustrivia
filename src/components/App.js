@@ -91,7 +91,7 @@ class App extends React.Component {
 			for (var cat = 1; cat <= 6; cat++) {
 
 				game.rounds[round].cats[cat] = {
-					catTitle: `Category ${cat}`,
+					catTitle: `Movies ${cat}`,
 					clues: {
 					}
 				};
