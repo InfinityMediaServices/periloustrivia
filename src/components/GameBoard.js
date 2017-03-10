@@ -9,9 +9,9 @@ class GameBoard extends React.Component {
 	renderCategory(key) {
 		const cat = this.props.game.cats[key];
 		return (
-			<div key={key} className="category cat cat-{key}">
+			<div key={key} className={`category cat cat-${key}`}>
 				<div className="cat-title">{cat.catTitle}</div>
-				{Object.keys(cat.clues).map((clueID) => {
+				{Object.keys(cat.clues).map(clueID => {
 					return (
 						<Clue 
 							key={clueID} 
