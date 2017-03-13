@@ -54,24 +54,22 @@ class App extends React.Component {
 
 	componentWillMount() {
 		// this runs right before the <App> is rendered
-		this.ref = base.syncState(`games/${this.props.params.gameId}/game`, {
+		const slug = this.props.params.gameSlug;
+		base.fetch(`slugs/${slug}`, {
 			context: this,
-			state: 'game'
+			then(slugData){
+				if (!slugData) {
+					return;
+				}
+				console.log('slugData: ', slugData);
+				this.ref = base.syncState(`games/${slugData.id}/game`, {
+					context: this,
+					state: 'game'
+				});
+				console.log('this.ref: ', this.ref);
+				this.loadSamples();
+			}
 		});
-
-		// check if there is any game in localStorage
-		// const localStorageRef = localStorage.getItem(`game-${this.props.params.gameId}`);
-
-		// if(localStorageRef) {
-		// 	// update our App component's game state
-		// 	this.setState({
-		// 		game: JSON.parse(localStorageRef)
-		// 	});
-		// }
-		// if(!this.state.game){
-		// }
-			this.loadSamples();
-
 	}
 
 	componentWillUnmount() {
@@ -79,7 +77,7 @@ class App extends React.Component {
 	}
 
 	// componentWillUpdate(nextProps, nextState) {
-	// 	localStorage.setItem(`game-${this.props.params.gameId}`, JSON.stringify(nextState.game));
+	// 	localStorage.setItem(`game-${this.props.params.gameSlug}`, JSON.stringify(nextState.game));
 	// }
 
 	loadSamples = () => {
@@ -131,7 +129,7 @@ class App extends React.Component {
 			{/*
 			*/}
 				<div className="temp">
-					{this.props.params.gameId}
+					{this.props.params.gameSlug}
 				</div>
 				<GameBoard game={this.state.game} selectClue={this.selectClue} />
 				<PlayBoard game={this.state.game} />
