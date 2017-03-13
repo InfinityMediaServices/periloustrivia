@@ -54,7 +54,7 @@ class App extends React.Component {
 
 	componentWillMount() {
 		// this runs right before the <App> is rendered
-		this.ref = base.syncState(`${this.props.params.gameId}/game`, {
+		this.ref = base.syncState(`games/${this.props.params.gameId}/game`, {
 			context: this,
 			state: 'game'
 		});
