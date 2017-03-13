@@ -9,7 +9,7 @@ class PlayBoard extends React.Component {
 	}
 	render() {
 		const game = this.props.game;
-		if(!game || !game.phase || !game.currentClue){
+		if(!game || !game.phase || !game.currentClue || !game.currentClue.cat){
 			return <div className="play-board"></div>
 		}
 		const phase = game.phase;
