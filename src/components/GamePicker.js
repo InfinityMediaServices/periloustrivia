@@ -1,7 +1,6 @@
 import React from 'react';
 import base from '../base';
 import Hashids  from 'hashids';
-import { getFunName } from '../helpers';
 
 const hashids = new Hashids(
 	"Salt and Pepa's here, and we're in effect", 
@@ -17,8 +16,14 @@ class GamePicker extends React.Component {
 		this.authenticate = this.authenticate.bind(this);
 		this.logout = this.logout.bind(this);
 		this.authHandler = this.authHandler.bind(this);
+		this.createGame = this.createGame.bind(this);
 		this.renderLogin = this.renderLogin.bind(this);
 		this.pushChild = this.pushChild.bind(this);
+
+		this.state = {
+			uid: null
+		}
+
 	}
 	goToGame(event) {
 		event.preventDefault();
@@ -57,29 +62,32 @@ class GamePicker extends React.Component {
 			console.error(err);
 			return;
 		}
-		// create new game
+		// this.createGame(authData.user);
 
+    this.setState({
+      uid: authData.user.uid
+    });
+	}
+
+	createGame(owner){
+		// return authData;
 		const gameData = {
 			players: {
-				[authData.user.uid] : {
-					uid: authData.user.uid,
-					displayName: authData.user.displayName,
-					email: authData.user.email,
-					photoURL: authData.user.photoURL,
+				[owner.uid] : {
+					uid: owner.uid, 
+					displayName: owner.displayName,
+					email: owner.email,
+					photoURL: owner.photoURL,
 				}
-			}
+			},
+			game: {}
 		};
-		console.log('gameData: ', gameData);
-									console.log('this: ', this);
-
 		const gameID = base.push('games', {
 			data: gameData
 		}).then(data => {
 			const slugRef = base.database().ref('slugs');
 			const gameID = data.key;
-
-			console.log('gameID in here: ', gameID);
-
+			// TODO: fix to promise approach here 
 			slugRef.once('value', (snapshot) => {
 				const data = snapshot.val() || {};
 				console.log('data: ', data);
@@ -88,26 +96,33 @@ class GamePicker extends React.Component {
 				console.log('gameSlug: ', gameSlug);
 				base.post(`slugs/${gameSlug}`, {
 					data: {
-						id: gameID.key
-					},
-					then(err){
-						if(!err){
-							// this.goToGame(gameSlug);
-						}
+						id: gameID
 					}
-				});
+				}).then(() => {
+					console.log('gameSlug in here: ', gameSlug);
+					console.log('gameID in here: ', gameID);
+					// console.log('router: ', router);
+					// console.log('router.transitionTo: ', router.transitionTo);
+					this.context.router.transitionTo(`/game/${gameSlug}`);
+				}).catch(err => {});
 			});
-		}).catch(err => {
+		}).catch(err => {});
 
-		});
 	}
 
 	renderLogin() {
 		return (
 			<nav className="login">
-				<h2>Inventory</h2>
-				<p>Sign in to get started</p>
+				<h2>Sign in to create a new game</h2>
 				<button className="google" onClick={() => this.authenticate('google')}>Log In with Google</button>
+
+      <form className="game-selector" onSubmit={(e) => this.goToGame(e)}>
+				<h2>Join an Existing game</h2>
+        <input type="text" required placeholder="Game Slug" ref={(input) => { this.gameInput = input}} />
+        <button type="submit">Go To Game →</button>
+      </form>
+
+
 			</nav>
 		)
 	}
@@ -121,17 +136,17 @@ class GamePicker extends React.Component {
 		)
 	}
 	render() {
-		return (
-			<div>
-				{ this.renderLogin() }
-				<form className="game-selector" onSubmit={(e) => this.goToGame(e)}>
-					<h2>Please Enter A Game</h2>
-					<input type="text" required placeholder="Game Name" defaultValue={getFunName()} ref={(input) => { this.gameInput = input}} />
-					<button type="submit">Visit Game →</button>
-				</form>
-				{/* { this.renderTest() } */}
-			</div>
-		)
+    const logout = <button onClick={this.logout}>Log Out!</button>;
+
+		if(!this.state.uid){
+			return (
+				<div>
+					{ this.renderLogin() }
+				</div>
+			)
+		} else {
+			return logout;
+		}
 	}
 }
 GamePicker.contextTypes = {

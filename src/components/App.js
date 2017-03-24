@@ -22,9 +22,9 @@ class App extends React.Component {
 	customMethod(param) {
 	}
 	setHelper(name, state) {
-	    const game = {...this.state.game};
+		const game = {...this.state.game};
 		game.phase['is' + name[0].toUpperCase() + name.slice(1)] = state;
-	    this.setState({ game });
+		this.setState({ game });
 	}
 	setHelpers(param) {
 		const names = this.phase.possibleNames;
@@ -33,20 +33,20 @@ class App extends React.Component {
 		}
 	}
 	setPhase(phase) {
-	    const game = {...this.state.game};
+		const game = {...this.state.game};
 		game.phase.name = phase;
 		this.setHelper(phase, true);
-	    this.setState({ game });
+		this.setState({ game });
 		return;
 	}
 	selectClue(cat, clue) {
-	    const game = {...this.state.game};
-	    game.currentClue = {
-	    	cat: cat,
-	    	clue: clue
-	    };
+		const game = {...this.state.game};
+		game.currentClue = {
+			cat: cat,
+			clue: clue
+		};
 		this.setPhase('cluePresentation');
-	    this.setState({ game });
+		this.setState({ game });
 	}
 	state = {
 		game: {} 
