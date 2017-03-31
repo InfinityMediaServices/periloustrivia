@@ -3,8 +3,8 @@ import base from '../base';
 import Hashids  from 'hashids';
 
 const hashids = new Hashids(
-	"Salt and Pepa's here, and we're in effect", 
-	8, 
+	"Salt and Pepa's here, and we're in effect",
+	8,
 	"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 );
 
@@ -19,12 +19,20 @@ class GamePicker extends React.Component {
 		this.createGame = this.createGame.bind(this);
 		this.renderLogin = this.renderLogin.bind(this);
 		this.pushChild = this.pushChild.bind(this);
-
 		this.state = {
-			uid: null
+			uid: null,
+			user: null,
 		}
-
 	}
+
+  componentDidMount() {
+    base.onAuth((user) => {
+      if(user) {
+        this.authHandler(null, { user });
+      }
+    });
+  }
+
 	goToGame(event) {
 		event.preventDefault();
 		console.log('You Changed the URL');
@@ -64,9 +72,10 @@ class GamePicker extends React.Component {
 		}
 		// this.createGame(authData.user);
 
-    this.setState({
-      uid: authData.user.uid
-    });
+		this.setState({
+			uid: authData.user.uid,
+			user: authData.user
+		});
 	}
 
 	createGame(owner){
@@ -74,7 +83,7 @@ class GamePicker extends React.Component {
 		const gameData = {
 			players: {
 				[owner.uid] : {
-					uid: owner.uid, 
+					uid: owner.uid,
 					displayName: owner.displayName,
 					email: owner.email,
 					photoURL: owner.photoURL,
@@ -82,12 +91,12 @@ class GamePicker extends React.Component {
 			},
 			game: {}
 		};
-		const gameID = base.push('games', {
+		base.push('games', {
 			data: gameData
 		}).then(data => {
 			const slugRef = base.database().ref('slugs');
 			const gameID = data.key;
-			// TODO: fix to promise approach here 
+			// TODO: fix to promise approach here
 			slugRef.once('value', (snapshot) => {
 				const data = snapshot.val() || {};
 				console.log('data: ', data);
@@ -101,28 +110,17 @@ class GamePicker extends React.Component {
 				}).then(() => {
 					console.log('gameSlug in here: ', gameSlug);
 					console.log('gameID in here: ', gameID);
-					// console.log('router: ', router);
-					// console.log('router.transitionTo: ', router.transitionTo);
 					this.context.router.transitionTo(`/game/${gameSlug}`);
 				}).catch(err => {});
 			});
 		}).catch(err => {});
-
 	}
 
 	renderLogin() {
 		return (
 			<nav className="login">
-				<h2>Sign in to create a new game</h2>
+				<h2>The first step is to sign in:</h2>
 				<button className="google" onClick={() => this.authenticate('google')}>Log In with Google</button>
-
-      <form className="game-selector" onSubmit={(e) => this.goToGame(e)}>
-				<h2>Join an Existing game</h2>
-        <input type="text" required placeholder="Game Slug" ref={(input) => { this.gameInput = input}} />
-        <button type="submit">Go To Game →</button>
-      </form>
-
-
 			</nav>
 		)
 	}
@@ -136,7 +134,7 @@ class GamePicker extends React.Component {
 		)
 	}
 	render() {
-    const logout = <button onClick={this.logout}>Log Out!</button>;
+		const logout = <button onClick={this.logout}>Log Out!</button>;
 
 		if(!this.state.uid){
 			return (
@@ -145,7 +143,21 @@ class GamePicker extends React.Component {
 				</div>
 			)
 		} else {
-			return logout;
+			return (
+				<div>
+					<span className="displayName"> {this.state.user.displayName} </span>
+
+					{ logout }
+					<form className="game-selector" onSubmit={e => this.goToGame(e)}>
+						<h2>Join an Existing game</h2>
+						<input type="text" required placeholder="Game Slug" ref={(input) => { this.gameInput = input}} />
+						<button type="submit">Go To Game →</button>
+					</form>
+					<p>
+						<button onClick={()=>{ this.createGame(this.state.user);  }}>Create a New Game</button>
+					</p>
+				</div>
+			)
 		}
 	}
 }

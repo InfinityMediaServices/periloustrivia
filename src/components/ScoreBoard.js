@@ -1,11 +1,17 @@
 import React from 'react';
 
 class ScoreBoard extends React.Component {
-  render() {
-    return (
-      <h2>ScoreBoard</h2>
-    )
-  }
+
+	render() {
+		if (this.props.game.activePlayer === undefined) {
+			return <div className="score-board"></div>
+		}
+		return (
+			<div className="score-board">
+				<h2>ScoreBoard </h2>
+			</div>
+		)
+	}
 }
 
 export default ScoreBoard;

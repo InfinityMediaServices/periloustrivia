@@ -1,11 +1,11 @@
 import React from 'react';
 import base from '../base';
 
-import GameBoard from './GameBoard'; 
-import PlayBoard from './PlayBoard'; 
-import sampleGame from '../sample-game';
+import GameBoard from './GameBoard';
+import PlayBoard from './PlayBoard';
+import emptyGame from '../empty-game';
 import sampleClues from '../clues';
-// import ScoreBoard from './ScoreBoard';
+import ScoreBoard from './ScoreBoard';
 // import Buzzer from './Buzzer';
 // import Timer from './Timer';
 // import StatusBar from './StatusBar';
@@ -18,6 +18,7 @@ class App extends React.Component {
 		this.setHelpers = this.setHelpers.bind(this);
 		this.setPhase = this.setPhase.bind(this);
 		this.selectClue = this.selectClue.bind(this);
+		this.loadSamples = this.loadSamples.bind(this);
 	}
 	customMethod(param) {
 	}
@@ -49,7 +50,7 @@ class App extends React.Component {
 		this.setState({ game });
 	}
 	state = {
-		game: {} 
+		game: {}
 	}
 
 	componentWillMount() {
@@ -61,13 +62,16 @@ class App extends React.Component {
 				if (!slugData) {
 					return;
 				}
-				console.log('slugData: ', slugData);
 				this.ref = base.syncState(`games/${slugData.id}/game`, {
 					context: this,
-					state: 'game'
+					state: 'game',
+					then(data) {
+						if (!Object.keys(this.state.game).length) {
+							this.createGame();
+							this.loadSamples();
+						}
+					}
 				});
-				console.log('this.ref: ', this.ref);
-				this.loadSamples();
 			}
 		});
 	}
@@ -75,66 +79,38 @@ class App extends React.Component {
 	componentWillUnmount() {
 		base.removeBinding(this.ref);
 	}
-
-	// componentWillUpdate(nextProps, nextState) {
-	// 	localStorage.setItem(`game-${this.props.params.gameSlug}`, JSON.stringify(nextState.game));
-	// }
-
-	loadSamples = () => {
-		console.log('sampleClues: ', sampleClues);
-		const game = sampleGame;
+	createGame() {
+		const game = emptyGame;
+		this.setState({
+			game: game
+		});
+	}
+	loadSamples() {
+		const game = this.state.game;
 		const clues = sampleClues;
-		var newClues = clues;
+		game.rounds = emptyGame.rounds;
 		for (var round = 1; round <= 3; round++) {
 			for (var cat = 1; cat <= 6; cat++) {
-
 				game.rounds[round].cats[cat] = {
 					catTitle: `Movies ${cat}`,
-					clues: {
-					}
+					clues: {}
 				};
-
 				for (var clue = 1; clue <= 5; clue++) {
 					game.rounds[round].cats[cat].clues[clue] = clues[Math.floor(Math.random()*clues.length)];
 				}
 			}
 		}
 		game.cats = game.rounds[1].cats;
-		this.setState({
-			game: game
-		});
-/*
-
-		newClues = clues.map(clue => {
-			Object.keys(clue.q).forEach(key =>{
-				key = parseInt(key, 10);
-				if (clue.q[key] === clue.cq){
-					clue.cq = key;
-				}
-			});
-			if(typeof clue.cq !== 'number'){
-				console.log('mismatch clue: ', clue);
-			}
-			return clue;
-		});
-		newClues = JSON.stringify(newClues);
-*/
-		console.log(newClues);
-
-	};
+		this.setState({ game: game });
+	}
 
 	render() {
 		return (
 			<div className="perilious-trivia">
-			{/*
-			*/}
-				<div className="temp">
-					{this.props.params.gameSlug}
-				</div>
+				<ScoreBoard game={this.state.game} />
 				<GameBoard game={this.state.game} selectClue={this.selectClue} />
 				<PlayBoard game={this.state.game} />
 				{/*
-				<ScoreBoard />
 				<Buzzer />
 				<Timer />
 				<StatusBar />

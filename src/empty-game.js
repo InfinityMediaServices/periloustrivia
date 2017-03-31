@@ -1,5 +1,5 @@
-// This is just some sample data so you don't have to think of your own!
-const sampleGame = {
+// This is just some empty data so you don't have to think of your own!
+const emptyGame = {
 	cats: [],
 	phase: {
 		possibleNames:[
@@ -32,16 +32,16 @@ const sampleGame = {
 	},
 	round: 0,
 	rounds: [
-		{ 
+		{
 			cats:[]
 		},
-		{ 
+		{
 			cats:[]
 		},
-		{ 
+		{
 			cats:[]
 		},
-		{ 
+		{
 			cats:[]
 		},
 	],
@@ -49,12 +49,12 @@ const sampleGame = {
 		cat:0,
 		clue:0,
 	},
-	// round: 1, // single 
+	// round: 1, // single
 	// round: 2, // double
 	// round: 3, // final
 	players: [
 		// id reserved for game use
-		{id: 0, name:'system'}, 
+		{id: 0, name:'system'},
 		// ids of real players may be weird and long
 		{id: 1, name:'Player 1'},
 		{id: 2, name:'Player 2'},
@@ -66,23 +66,22 @@ const sampleGame = {
 };
 
 for (var i = 1; i <= 6; i++) {
-	sampleGame.cats[i] = {
-		catTitle: `Category ${i}`,
-		clues: {
-		}
+	emptyGame.cats[i] = {
+		catTitle: 'false',
+		clues: {}
 	};
 	for (var j = 1; j <= 5; j++) {
-		sampleGame.cats[i].clues[j] = {
-			clue: `This Is A Thing`,
+		emptyGame.cats[i].clues[j] = {
+			clue: 'false',
 			q:{
-				1: `What Is Stuff?`,
-				2: `What Are Things?`,
-				3: `Who Is This?`,
-				4: `Where Is That?`,
+				1: 'false',
+				2: 'false',
+				3: 'false',
+				4: 'false',
 			},
-			cq: 3
+			cq: 0
 		};
 	}
 }
 
-export default sampleGame;
+export default emptyGame;
