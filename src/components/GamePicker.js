@@ -24,13 +24,13 @@ class GamePicker extends React.Component {
 		}
 	}
 
-  componentDidMount() {
-    base.onAuth((user) => {
-      if(user) {
-        this.authHandler(null, { user });
-      }
-    });
-  }
+	componentDidMount() {
+		base.onAuth((user) => {
+			if(user) {
+				this.authHandler(null, { user });
+			}
+		});
+	}
 
 	goToGame(event) {
 		event.preventDefault();
@@ -102,6 +102,7 @@ class GamePicker extends React.Component {
 				}).catch(err => {});
 			});
 		}).catch(err => {});
+
 	}
 
 	renderLogin() {
@@ -123,7 +124,6 @@ class GamePicker extends React.Component {
 	}
 	render() {
 		const logout = <button onClick={this.logout}>Log Out!</button>;
-
 		if(!this.state.uid){
 			return (
 				<div>
@@ -134,7 +134,6 @@ class GamePicker extends React.Component {
 			return (
 				<div>
 					<span className="displayName"> {this.state.user.displayName} </span>
-
 					{ logout }
 					<form className="game-selector" onSubmit={e => this.goToGame(e)}>
 						<h2>Join an Existing game</h2>
