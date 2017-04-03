@@ -13,14 +13,11 @@ import ScoreBoard from './ScoreBoard';
 class App extends React.Component {
 	constructor() {
 		super();
-		this.customMethod = this.customMethod.bind(this);
 		this.setHelper = this.setHelper.bind(this);
 		this.setHelpers = this.setHelpers.bind(this);
 		this.setPhase = this.setPhase.bind(this);
 		this.selectClue = this.selectClue.bind(this);
 		this.loadSamples = this.loadSamples.bind(this);
-	}
-	customMethod(param) {
 	}
 	setHelper(name, state) {
 		const game = {...this.state.game};
