@@ -149,6 +149,6 @@ class GamePicker extends React.Component {
 	}
 }
 GamePicker.contextTypes = {
-	router: React.PropTypes.object
+	router: React.PropTypes.object.isRequired
 }
 export default GamePicker;

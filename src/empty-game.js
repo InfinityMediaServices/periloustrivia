@@ -3,6 +3,7 @@ const emptyGame = {
 	cats: [],
 	phase: {
 		possibleNames:[
+			'playerSelect',
 			'roundIntro',
 			'categoryPresentation',
 			'clueSelection',
@@ -14,9 +15,8 @@ const emptyGame = {
 			'scoreAdjustment',
 			'init'
 		],
-		name: 'init',
 		// State Helper booleans
-		isInit: true,
+		isPlayerSelect: false,
 		isRoundIntro: false,
 		isCategoryPresentation: false,
 		isClueSelection: false,
@@ -27,6 +27,8 @@ const emptyGame = {
 		isResults: false,
 		isScoreAdjustment: false,
 
+		isInit: true,
+		name: 'init',
 		hasInit: false
 
 	},

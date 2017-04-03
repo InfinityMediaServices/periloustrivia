@@ -18,8 +18,11 @@ class Clue extends React.Component {
 		)
 	}
 	static propTypes = {
-		clue: React.PropTypes.string.isRequired,
-		difficulty: React.PropTypes.number.isRequired
+		clueID: React.PropTypes.string.isRequired, // {clueID}
+		difficulty: React.PropTypes.number.isRequired, // {parseInt(clueID, 10)}
+		cat: React.PropTypes.number.isRequired, // {key}
+		clue: React.PropTypes.string.isRequired, // {cat.clues[clueID].clue}
+		selectClue: React.PropTypes.func.isRequired, // {this.props.selectClue}
 	};
 }
 
