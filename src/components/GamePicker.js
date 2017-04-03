@@ -35,10 +35,10 @@ class GamePicker extends React.Component {
 
 	goToGame(event) {
 		event.preventDefault();
-		console.log('You Changed the URL');
+		// console.log('You Changed the URL');
 		// first grab the text from the box
 		const gameId = this.gameInput.value;
-		console.log(`Going to ${gameId}`)
+		// console.log(`Going to ${gameId}`)
 		// second we're going to transition from / to /game/:gameId
 		this.context.router.transitionTo(`/game/${gameId}`);
 	}
@@ -55,7 +55,7 @@ class GamePicker extends React.Component {
 	}
 
 	authenticate(provider) {
-		console.log(`Trying to log in with ${provider}`);
+		// console.log(`Trying to log in with ${provider}`);
 		base.authWithOAuthPopup(provider, this.authHandler);
 	}
 
@@ -65,7 +65,7 @@ class GamePicker extends React.Component {
 	}
 
 	authHandler(err, authData)  {
-		console.log('authData: ', authData);
+		// console.log('authData: ', authData);
 		if (err) {
 			console.error(err);
 			return;
@@ -99,17 +99,17 @@ class GamePicker extends React.Component {
 			// TODO: fix to promise approach here
 			slugRef.once('value', (snapshot) => {
 				const data = snapshot.val() || {};
-				console.log('data: ', data);
+				// console.log('data: ', data);
 				const slugCount = Object.keys(data).length;
 				const gameSlug = hashids.encode(slugCount);
-				console.log('gameSlug: ', gameSlug);
+				// console.log('gameSlug: ', gameSlug);
 				base.post(`slugs/${gameSlug}`, {
 					data: {
 						id: gameID
 					}
 				}).then(() => {
-					console.log('gameSlug in here: ', gameSlug);
-					console.log('gameID in here: ', gameID);
+					// console.log('gameSlug in here: ', gameSlug);
+					// console.log('gameID in here: ', gameID);
 					this.context.router.transitionTo(`/game/${gameSlug}`);
 				}).catch(err => {});
 			});
