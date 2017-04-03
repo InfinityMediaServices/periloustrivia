@@ -18,7 +18,6 @@ class GamePicker extends React.Component {
 		this.authHandler = this.authHandler.bind(this);
 		this.createGame = this.createGame.bind(this);
 		this.renderLogin = this.renderLogin.bind(this);
-		this.pushChild = this.pushChild.bind(this);
 		this.state = {
 			uid: null,
 			user: null,
@@ -41,17 +40,6 @@ class GamePicker extends React.Component {
 		// console.log(`Going to ${gameId}`)
 		// second we're going to transition from / to /game/:gameId
 		this.context.router.transitionTo(`/game/${gameId}`);
-	}
-	pushChild(name) {
-		var pusher;
-		for (var i = 0; i < 100000; i++) {
-			pusher = base.push('/', {
-				data: {
-					thing: i
-				}
-			});
-			console.log('pusher.key: ', pusher.key);
-		}
 	}
 
 	authenticate(provider) {
