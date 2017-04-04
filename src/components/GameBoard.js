@@ -29,9 +29,14 @@ class GameBoard extends React.Component {
 	render() {
 		const game = this.props.game;
 		if(game && game.players && Object.keys(game.players).length >= 2){
+			const playerCount = Object.keys(game.players).length;
 			return (
 				<div className="game-board">
-					<h2>There are now {Object.keys(game.players).length} players.</h2>
+					<div className="game-info">
+						<h2>There are now {playerCount} players.</h2>
+						{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
+						<p>if you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button></p>
+					</div>
 				</div>
 			)
 		}

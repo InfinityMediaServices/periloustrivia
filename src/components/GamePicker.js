@@ -12,7 +12,6 @@ class GamePicker extends React.Component {
 	constructor() {
 		super();
 		this.goToGame = this.goToGame.bind(this);
-		this.renderTest = this.renderTest.bind(this);
 		this.authenticate = this.authenticate.bind(this);
 		this.logout = this.logout.bind(this);
 		this.authHandler = this.authHandler.bind(this);
@@ -77,6 +76,7 @@ class GamePicker extends React.Component {
 					photoURL: owner.photoURL,
 				}
 			},
+			owner: owner.uid,
 			game: {}
 		};
 		base.push('games', {
@@ -101,7 +101,9 @@ class GamePicker extends React.Component {
 					this.context.router.transitionTo(`/game/${gameSlug}`);
 				}).catch(err => {});
 			});
-		}).catch(err => {});
+		}).catch(err => {
+			console.error(err);
+		});
 
 	}
 
@@ -113,15 +115,7 @@ class GamePicker extends React.Component {
 			</nav>
 		)
 	}
-	renderTest() {
-		return (
-			<div>
-				{Array.from(Array(10000).keys()).map(index => {
-					return <pre key={index}>{hashids.encode(index)}</pre>
-				})}
-			</div>
-		)
-	}
+
 	render() {
 		const logout = <button onClick={this.logout}>Log Out!</button>;
 		if(!this.state.uid){

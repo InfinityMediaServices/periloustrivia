@@ -20,7 +20,12 @@ class App extends React.Component {
 		this.hasInit = this.hasInit.bind(this);
 		this.selectClue = this.selectClue.bind(this);
 		this.joinGame = this.joinGame.bind(this);
+		this.startGame = this.startGame.bind(this);
+		this.setActivePlayer = this.setActivePlayer.bind(this);
 		this.loadSamples = this.loadSamples.bind(this);
+		this.authenticate = this.authenticate.bind(this);
+		this.logout = this.logout.bind(this);
+		this.authHandler = this.authHandler.bind(this);
 		this.state = this.state || { game: {} }
 	}
 	componentWillMount() {
@@ -82,8 +87,17 @@ class App extends React.Component {
 	}
 
 	logout() {
+		const game = {...this.state.game};
+		const uid = this.state.uid;
+		console.log('game before delete: ', game);
+		game.players[uid] = null;
+		console.log('game after delete: ', game);
+		this.setState({
+			game: game,
+			uid: null,
+			user: null,
+		});
 		base.unauth();
-		this.setState({ uid: null });
 	}
 
 	authHandler(err, authData)  {
@@ -102,6 +116,7 @@ class App extends React.Component {
 			const game = {...this.state.game};
 			game.players[authData.user.uid] = {
 				displayName: authData.user.displayName,
+				isReady: false,
 				email: authData.user.email,
 				uid: authData.user.uid,
 				photoURL: authData.user.photoURL,
@@ -168,11 +183,39 @@ class App extends React.Component {
 		const game = {...this.state.game};
 		game.players[user.uid] = {
 			displayName: user.displayName,
+			isReady: false,
 			email: user.email,
 			uid: user.uid,
 			photoURL: user.photoURL,
 		};
 		this.setState({ game });
+	}
+
+	startGame() {
+		const game = {...this.state.game};
+		const user = {...this.state.user};
+		user.isReady = true;
+		game.players[user.uid].isReady = true;
+		// check that all users are ready
+		const players = Object.keys(game.players);
+		let allGood = true;
+		players.forEach(player => {
+			if(!game.players[player].isReady){
+				allGood = false;
+			}
+		});
+		if (allGood) {
+			console.log('all good');
+		} else {
+			console.log('waiting on someone');
+		}
+		this.setState({ game, user });
+	}
+
+	setActivePlayer(player) {
+		const game = {...this.state.game};
+		game.activePlayer = player.uid;
+		this.setState({game});
 	}
 
 	loadSamples(game) {
@@ -200,29 +243,44 @@ class App extends React.Component {
 		} else {
 			game.players[this.state.uid] = {
 				displayName: this.state.user.displayName,
+				isReady: false,
 				email: this.state.user.email,
 				uid: this.state.user.uid,
 				photoURL: this.state.user.photoURL,
 			};
 		}
+		game.owner = this.state.uid;
 
 		console.log('game at fn end: ', game);
 		return game;
 	}
 
+
 	render() {
 		return (
 			<div className="perilious-trivia">
-				<p>
-					<a href="/">Home</a>
-				</p>
+				<nav className="menu">
+					<span> <a href="/">Home</a> </span>
+				{ !this.state.uid ?
+					<button className="google" onClick={() => this.authenticate('google')}>
+						Log In with Google
+					</button>
+				:
+					<span className="displayName">
+						<span> Logged in as {this.state.user.displayName} </span>
+						<button onClick={this.logout}>Log Out</button>
+					</span>
+				}
+				</nav>
 				<ScoreBoard
 					game={this.state.game}
 					joinGame={this.joinGame}
-					me={this.state.user}
+					me={this.state.user || {}}
 				/>
 				<GameBoard
 					game={this.state.game}
+					me={this.state.user || {}}
+					startGame={this.startGame}
 					selectClue={this.selectClue}
 					isPhase={this.isPhase}
 				/>
