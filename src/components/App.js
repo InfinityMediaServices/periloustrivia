@@ -134,8 +134,9 @@ class App extends React.Component {
 		this.setState({ game });
 	}
 
-	setHelpers(param) {
-		const names = this.phase.possibleNames;
+	setHelpers() {
+		const game = {...this.state.game};
+		const names = game.phase.possibleNames;
 		for (var i = 0; i < names.length; i++) {
 			this.setHelper(names[i], this.phase.name === names[i]);
 		}
@@ -206,6 +207,8 @@ class App extends React.Component {
 		});
 		if (allGood) {
 			console.log('all good');
+			this.setActivePlayer(game.owner);
+			this.setPhase('gameIntro');
 		} else {
 			console.log('waiting on someone');
 		}
@@ -214,7 +217,7 @@ class App extends React.Component {
 
 	setActivePlayer(player) {
 		const game = {...this.state.game};
-		game.activePlayer = player.uid;
+		game.activePlayer = game.players[player].uid;
 		this.setState({game});
 	}
 

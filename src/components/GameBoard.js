@@ -30,6 +30,7 @@ class GameBoard extends React.Component {
 		const game = this.props.game;
 		if(game && game.players && Object.keys(game.players).length >= 2){
 			const playerCount = Object.keys(game.players).length;
+			console.log('game.phase.name: ', game.phase.name);
 			return (
 				<div className="game-board">
 					<div className="game-info">
