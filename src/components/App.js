@@ -135,10 +135,12 @@ class App extends React.Component {
 	}
 
 	setHelpers() {
+		console.log('Running Set Helpers');
 		const game = {...this.state.game};
 		const names = game.phase.possibleNames;
 		for (var i = 0; i < names.length; i++) {
-			this.setHelper(names[i], this.phase.name === names[i]);
+			console.log('names[i]: ', names[i]);
+			this.setHelper(names[i], game.phase.name === names[i]);
 		}
 	}
 
@@ -146,18 +148,26 @@ class App extends React.Component {
 		const game = {...this.state.game};
 		game.phase.name = phase;
 		this.setHelper(phase, true);
+		this.setHelpers();
 		this.setState({ game });
 		return;
 	}
 
 	isPhase(phase) {
-		console.log('isPhase: ', phase);
-		if (!this.state.game || !this.state.game.phase) {
-			return false;
-		}
+		let isIt = null;
 		const game = {...this.state.game};
-		const prop = game.phase['is' + name[0].toUpperCase() + name.slice(1)];
-		return game.phase[prop];
+		if (!game || !game.phase) {
+			isIt =  false;
+		} else {
+			const name = game.phase.name;
+			// const prop = game.phase['is' + name[0].toUpperCase() + name.slice(1)];
+			// console.log('prop: ', prop);
+			// isIt = game.phase[prop];
+			isIt = name === phase;
+			console.log(game.phase, isIt);
+		}
+		console.log('checking isPhase: ', phase);
+		return isIt;
 	}
 
 	hasInit(game) {
@@ -209,6 +219,7 @@ class App extends React.Component {
 			console.log('all good');
 			this.setActivePlayer(game.owner);
 			this.setPhase('gameIntro');
+			game.round = 1;
 		} else {
 			console.log('waiting on someone');
 		}
@@ -278,6 +289,7 @@ class App extends React.Component {
 				<ScoreBoard
 					game={this.state.game}
 					joinGame={this.joinGame}
+					startGame={this.startGame}
 					me={this.state.user || {}}
 				/>
 				<GameBoard

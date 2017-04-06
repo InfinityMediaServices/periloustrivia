@@ -17,7 +17,7 @@ class GameBoard extends React.Component {
 							key={clueID}
 							clueID={clueID}
 							difficulty={parseInt(clueID, 10)}
-							cat={key}
+							cat={parseInt(key, 10)}
 							clue={cat.clues[clueID].clue}
 							selectClue={this.props.selectClue}
 						/>
@@ -28,34 +28,18 @@ class GameBoard extends React.Component {
 	}
 	render() {
 		const game = this.props.game;
-		if(game && game.players && Object.keys(game.players).length >= 2){
-			const playerCount = Object.keys(game.players).length;
-			console.log('game.phase.name: ', game.phase.name);
+		if (!game) {
+			return null;
+		}
+		if (game.round && game.round > 0){
+			const catIds = Object.keys(this.props.game.cats);
 			return (
 				<div className="game-board">
-					<div className="game-info">
-						<h2>There are now {playerCount} players.</h2>
-						{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
-						<p>if you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button></p>
-					</div>
+					{catIds.map(this.renderCategory)}
 				</div>
 			)
 		}
-		if(!game || !game.round){
-			console.log('game: ', game);
-			return (
-				<div className="game-board">
-					<h2>Please finalize players above and then press begin game</h2>
-				</div>
-			)
-		}
-		console.log('game.players: ', game.players);
-		const catIds = Object.keys(this.props.game.cats);
-		return (
-			<div className="game-board">
-				{catIds.map(this.renderCategory)}
-			</div>
-		)
+		return null;
 	}
 }
 

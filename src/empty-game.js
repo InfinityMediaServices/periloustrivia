@@ -4,6 +4,7 @@ const emptyGame = {
 	phase: {
 		possibleNames:[
 			'playerSelect',
+			'gameIntro',
 			'roundIntro',
 			'categoryPresentation',
 			'clueSelection',
@@ -17,6 +18,7 @@ const emptyGame = {
 		],
 		// State Helper booleans
 		isPlayerSelect: false,
+		isGameIntro: false,
 		isRoundIntro: false,
 		isCategoryPresentation: false,
 		isClueSelection: false,

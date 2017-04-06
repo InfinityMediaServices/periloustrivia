@@ -28,10 +28,12 @@ class ScoreBoard extends React.Component {
 	render() {
 		const game = this.props.game;
 		const me = this.props.me;
-		if (game.players === undefined) {
+		console.log('me.isReady: ', me.isReady);
+		if (!game.players) {
 			return <div className="score-board"></div>
 		}
 		const playerCount = Object.keys(game.players).length;
+
 		return (
 			<div className="score-board">
 				<h2>ScoreBoard </h2>
@@ -44,11 +46,11 @@ class ScoreBoard extends React.Component {
 							}
 							return (
 								<li key={key}>
-								{/*
-									<div className="playerImg">
-									<img src={game.players[key].photoURL} alt={game.players[key].displayName}/>
-									</div>
-								*/}
+									{/*
+										<div className="playerImg">
+										<img src={game.players[key].photoURL} alt={game.players[key].displayName}/>
+										</div>
+									*/}
 									{game.players[key].displayName}
 									{key === me.uid ? ' (you)' : ''} -
 									{
@@ -59,14 +61,16 @@ class ScoreBoard extends React.Component {
 												Waiting {playerCount < 2 ? 'for other players to join' : 'to confirm readiness to play' }
 											</strong>
 									}
+									{key === me.uid && !me.isReady ? <span>if you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button></span> : ''}
 								</li>
 							)
 						})}
 						{ this.renderCTA() }
 					</ul>
-					<p>
-						To invite more players to the game, please send them to this url <a href={window.location.toString()}>{window.location.toString()}</a>
-					</p>
+					<h2>There are now {playerCount} players.</h2>
+					{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
+
+					<p> To invite more players to the game, please send them to this url <a href={window.location.toString()}>{window.location.toString()}</a> </p>
 				</div>
 			</div>
 		)
