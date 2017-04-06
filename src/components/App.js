@@ -22,6 +22,7 @@ class App extends React.Component {
 		this.joinGame = this.joinGame.bind(this);
 		this.startGame = this.startGame.bind(this);
 		this.setActivePlayer = this.setActivePlayer.bind(this);
+		this.buzzIn = this.buzzIn.bind(this);
 		this.loadSamples = this.loadSamples.bind(this);
 		this.authenticate = this.authenticate.bind(this);
 		this.logout = this.logout.bind(this);
@@ -36,6 +37,7 @@ class App extends React.Component {
 			context: this,
 			then(slugData){
 				if (!slugData) { return; }
+				this.slugID = slugData.id;
 				this.ref = base.syncState(`games/${slugData.id}/game`, {
 					context: this,
 					state: 'game'
@@ -189,6 +191,14 @@ class App extends React.Component {
 		this.setPhase('cluePresentation');
 		this.setState({ game });
 	}
+	buzzIn() {
+		base.push(`games/${this.slugID}/game/buzzes`, {
+			data: {
+				uid: this.state.uid,
+				timestamp: base.database.ServerValue.TIMESTAMP
+			}
+		});
+	}
 
 	joinGame(user) {
 		const game = {...this.state.game};
@@ -269,8 +279,11 @@ class App extends React.Component {
 		return game;
 	}
 
-
 	render() {
+		let me = {};
+		if(this.state.uid && this.state.game && this.state.game.players && this.state.game.players[this.state.uid]) {
+			me = this.state.game.players[this.state.uid];
+		}
 		return (
 			<div className="perilious-trivia">
 				<nav className="menu">
@@ -290,11 +303,11 @@ class App extends React.Component {
 					game={this.state.game}
 					joinGame={this.joinGame}
 					startGame={this.startGame}
-					me={this.state.user || {}}
+					me={me}
 				/>
 				<GameBoard
 					game={this.state.game}
-					me={this.state.user || {}}
+					me={me}
 					startGame={this.startGame}
 					selectClue={this.selectClue}
 					isPhase={this.isPhase}

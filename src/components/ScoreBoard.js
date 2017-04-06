@@ -28,12 +28,10 @@ class ScoreBoard extends React.Component {
 	render() {
 		const game = this.props.game;
 		const me = this.props.me;
-		console.log('me.isReady: ', me.isReady);
 		if (!game.players) {
 			return <div className="score-board"></div>
 		}
 		const playerCount = Object.keys(game.players).length;
-
 		return (
 			<div className="score-board">
 				<h2>ScoreBoard </h2>
@@ -44,6 +42,16 @@ class ScoreBoard extends React.Component {
 							if (!game.players[key]) {
 								return null
 							}
+							let subText = null;
+							console.log('game.players[key]: ', game.players[key]);
+							if(game.players[key].isReady) {
+								subText = "Confirmed and ready to play";
+							} else if (playerCount < 2) {
+								subText = "Waiting for other players to join";
+							} else {
+								subText = "Waiting to confirm readiness to play";
+							}
+							console.log('me.isReady: ', me.isReady);
 							return (
 								<li key={key}>
 									{/*
@@ -52,21 +60,16 @@ class ScoreBoard extends React.Component {
 										</div>
 									*/}
 									{game.players[key].displayName}
-									{key === me.uid ? ' (you)' : ''} -
-									{
-										game.players[key].isReady ?
-											<strong> Confirmed and ready to play </strong>
-										:
-											<strong>
-												Waiting {playerCount < 2 ? 'for other players to join' : 'to confirm readiness to play' }
-											</strong>
-									}
-									{key === me.uid && !me.isReady ? <span>if you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button></span> : ''}
+									{key === me.uid ? ' (you)' : ''}
+									<span> - </span>
+									<strong>{ subText }</strong>
+									{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button> </span> : ''}
 								</li>
 							)
 						})}
 						{ this.renderCTA() }
 					</ul>
+
 					<h2>There are now {playerCount} players.</h2>
 					{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
 
