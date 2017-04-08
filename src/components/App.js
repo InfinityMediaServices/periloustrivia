@@ -185,6 +185,7 @@ class App extends React.Component {
 		}
 		return this.state.game.phase.hasInit;
 	}
+	}
 
 	selectClue(cat, clue) {
 		const game = {...this.state.game};
