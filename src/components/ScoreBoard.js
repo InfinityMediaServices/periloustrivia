@@ -5,24 +5,38 @@ class ScoreBoard extends React.Component {
 	constructor() {
 		super();
 		this.renderCTA = this.renderCTA.bind(this);
+		this.renderSummary = this.renderSummary.bind(this);
 	}
 
 	renderCTA() {
 		const game = this.props.game;
 		const me = this.props.me;
-		if(!me.uid){
+		console.log('me: ', me);
+		const player = this.props.player;
+		if(!player || !player.uid){
 			return <li> Login above to join game </li>
 		}
 		if(!Object.keys(game.players).includes(me.uid)) {
 			return (
 				<li>
-					<button onClick={()=>{ this.props.joinGame(me);  }}>
-						Join Game
-					</button>
+					You are logged in and ready to <button onClick={()=>{ this.props.joinGame(player);  }}> Join Game </button>
 				</li>
 			)
 		}
 		return ''
+	}
+	renderSummary() {
+		const game = this.props.game;
+		const playerCount = Object.keys(game.players).length;
+		if (!game.round) {
+			return (<div>
+				<h2>There are now {playerCount} players.</h2>
+				{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
+				{playerCount < 2 ? <p> You must have at least 2 players </p> : ''}
+				<p> To invite more players to the game, please send them to this url <a href={window.location.toString()}>{window.location.toString()}</a> </p>
+			</div> )
+		}
+		return null;
 	}
 
 	render() {
@@ -39,12 +53,16 @@ class ScoreBoard extends React.Component {
 					<h3>Players</h3>
 					<ul>
 						{Object.keys(game.players).map(key => {
+							const score = game.players[key].score || 0;
 							if (!game.players[key]) {
 								return null
 							}
 							let subText = null;
 							console.log('game.players[key]: ', game.players[key]);
-							if(game.players[key].isReady) {
+							if(game.round > 0) {
+								subText = "$" + score;
+
+							} else if(game.players[key].isReady) {
 								subText = "Confirmed and ready to play";
 							} else if (playerCount < 2) {
 								subText = "Waiting for other players to join";
@@ -53,15 +71,15 @@ class ScoreBoard extends React.Component {
 							}
 							console.log('me.isReady: ', me.isReady);
 							return (
-								<li key={key}>
+								<li key={key} className={key === me.uid ? 'player-me' : 'player-other'}>
 									{/*
 										<div className="playerImg">
 										<img src={game.players[key].photoURL} alt={game.players[key].displayName}/>
 										</div>
 									*/}
 									{game.players[key].displayName}
-									{key === me.uid ? ' (you)' : ''}
-									<span> - </span>
+									{key === me.uid ? <span className="is-self"> (you) </span> : null}
+									<span> </span>
 									<strong>{ subText }</strong>
 									{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button> </span> : ''}
 								</li>
@@ -69,11 +87,8 @@ class ScoreBoard extends React.Component {
 						})}
 						{ this.renderCTA() }
 					</ul>
+					{ this.renderSummary() }
 
-					<h2>There are now {playerCount} players.</h2>
-					{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
-
-					<p> To invite more players to the game, please send them to this url <a href={window.location.toString()}>{window.location.toString()}</a> </p>
 				</div>
 			</div>
 		)

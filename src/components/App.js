@@ -225,6 +225,9 @@ class App extends React.Component {
 				allGood = false;
 			}
 		});
+		if (Object.keys(players).length < 2) {
+			allGood = false;
+		}
 		if (allGood) {
 			console.log('all good');
 			this.setActivePlayer(game.owner);
@@ -281,6 +284,8 @@ class App extends React.Component {
 
 	render() {
 		let me = {};
+		console.log('this.state.game: ', this.state.game);
+
 		if(this.state.uid && this.state.game && this.state.game.players && this.state.game.players[this.state.uid]) {
 			me = this.state.game.players[this.state.uid];
 		}
@@ -304,6 +309,7 @@ class App extends React.Component {
 					joinGame={this.joinGame}
 					startGame={this.startGame}
 					me={me}
+					player={this.state.user}
 				/>
 				<GameBoard
 					game={this.state.game}
