@@ -28,6 +28,8 @@ class App extends React.Component {
 		this.logout                = this.logout.bind(this);
 		this.authHandler           = this.authHandler.bind(this);
 		this.gameOn                = this.gameOn.bind(this);
+		this.getMe                 = this.getMe.bind(this);
+		this.setMe                 = this.setMe.bind(this);
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
@@ -185,6 +187,29 @@ class App extends React.Component {
 		}
 		return this.state.game.phase.hasInit;
 	}
+	gameOn() {
+		return this.state.game && this.state.game.round && this.state.game
+	}
+
+	getMe(){
+		const game = {...this.state.game};
+		const user = {...this.state.user};
+		if (!game || !game.players || !user || !user.uid || !game.players[user.uid]){
+			return false;
+		}
+		return game.players[user.uid]
+	}
+
+	setMe(propName, propVal){
+		const game = {...this.state.game};
+		const user = {...this.state.user};
+		if (!game || !game.players || !user || !user.uid || !game.players[user.uid]){
+			return false;
+		}
+		game.players[user.uid][propName] = propVal;
+		// set state
+		this.setState({ game });
+		return game.players[user.uid];
 	}
 
 	selectClue(cat, clue) {
@@ -196,6 +221,7 @@ class App extends React.Component {
 		this.setPhase('cluePresentation');
 		this.setState({ game });
 	}
+
 	buzzIn() {
 		base.push(`games/${this.slugID}/game/buzzes`, {
 			data: {
@@ -220,8 +246,9 @@ class App extends React.Component {
 	startGame() {
 		const game = {...this.state.game};
 		const user = {...this.state.user};
-		user.isReady = true;
-		game.players[user.uid].isReady = true;
+		const me = this.getMe();
+		me.isReady = true;
+		me.score = 0;
 		// check that all users are ready
 		const players = Object.keys(game.players);
 		let allGood = true;
@@ -286,6 +313,20 @@ class App extends React.Component {
 		console.log('game at fn end: ', game);
 		return game;
 	}
+
+
+	doGameIntro(){
+		this.setPhase('roundIntro');
+	}
+
+	doRoundIntro(){
+		this.setPhase('clueSelection');
+	}
+
+	doQuestionSelectIntro(){
+		this.setPhase('questionSelect');
+	}
+
 
 	render() {
 		let me = {};
