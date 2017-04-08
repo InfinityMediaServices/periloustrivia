@@ -13,21 +13,25 @@ import ScoreBoard from './ScoreBoard';
 class App extends React.Component {
 	constructor() {
 		super();
-		this.setHelper = this.setHelper.bind(this);
-		this.setHelpers = this.setHelpers.bind(this);
-		this.setPhase = this.setPhase.bind(this);
-		this.isPhase = this.isPhase.bind(this);
-		this.hasInit = this.hasInit.bind(this);
-		this.selectClue = this.selectClue.bind(this);
-		this.joinGame = this.joinGame.bind(this);
-		this.startGame = this.startGame.bind(this);
-		this.setActivePlayer = this.setActivePlayer.bind(this);
-		this.buzzIn = this.buzzIn.bind(this);
-		this.loadSamples = this.loadSamples.bind(this);
-		this.authenticate = this.authenticate.bind(this);
-		this.logout = this.logout.bind(this);
-		this.authHandler = this.authHandler.bind(this);
-		this.state = this.state || { game: {} }
+		this.setHelper             = this.setHelper.bind(this);
+		this.setHelpers            = this.setHelpers.bind(this);
+		this.setPhase              = this.setPhase.bind(this);
+		this.isPhase               = this.isPhase.bind(this);
+		this.hasInit               = this.hasInit.bind(this);
+		this.selectClue            = this.selectClue.bind(this);
+		this.joinGame              = this.joinGame.bind(this);
+		this.startGame             = this.startGame.bind(this);
+		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.buzzIn                = this.buzzIn.bind(this);
+		this.loadSamples           = this.loadSamples.bind(this);
+		this.authenticate          = this.authenticate.bind(this);
+		this.logout                = this.logout.bind(this);
+		this.authHandler           = this.authHandler.bind(this);
+		this.gameOn                = this.gameOn.bind(this);
+		this.doGameIntro           = this.doGameIntro.bind(this);
+		this.doRoundIntro          = this.doRoundIntro.bind(this);
+		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
+		this.state                 = this.state || { game: {} }
 	}
 	componentWillMount() {
 		// this runs right before the <App> is rendered
