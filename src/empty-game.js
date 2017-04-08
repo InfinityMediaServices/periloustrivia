@@ -3,7 +3,9 @@ const emptyGame = {
 	cats: [],
 	phase: {
 		possibleNames:[
+			// PRE GAME
 			'playerSelect',
+			// GAME ON
 			'gameIntro',
 			'roundIntro',
 			'categoryPresentation',
@@ -14,6 +16,7 @@ const emptyGame = {
 			'questionSelect',
 			'results',
 			'scoreAdjustment',
+			// system phase
 			'init'
 		],
 		// State Helper booleans
@@ -49,13 +52,13 @@ const emptyGame = {
 			cats:[]
 		},
 	],
+	// round: 1, // single
+	// round: 2, // double
+	// round: 3, // final
 	currentClue: {
 		cat:0,
 		clue:0,
 	},
-	// round: 1, // single
-	// round: 2, // double
-	// round: 3, // final
 	players: [
 		// id reserved for game use
 		{id: 0, name:'system'},
