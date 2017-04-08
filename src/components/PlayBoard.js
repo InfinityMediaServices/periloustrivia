@@ -10,12 +10,12 @@ class PlayBoard extends React.Component {
 	render() {
 		const game = this.props.game;
 		if(!game || !game.phase || !game.currentClue || !game.currentClue.cat){
-			return <div className="play-board"></div>
+			return null;
 		}
 		const phase = game.phase;
 		const clue = game.cats[game.currentClue.cat].clues[game.currentClue.clue];
 
-		if(phase.isCluePresentation){	
+		if(phase.isCluePresentation){
 			return (
 				<div className="play-board">
 					<h2>{clue.clue}</h2>
@@ -28,9 +28,8 @@ class PlayBoard extends React.Component {
 					</ul>
 				</div>
 			)
-		} else {
-			return <div className="play-board"></div>
 		}
+		return <div className="play-board dormant"></div>
 	}
 }
 
