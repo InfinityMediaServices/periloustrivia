@@ -4,7 +4,11 @@ class Clue extends React.Component {
 	render() {
 		return (
 			<div className="clue">
-				<button onClick={() => this.props.selectClue(this.props.cat, this.props.clueID)}>
+				<button
+					onClick={() => this.props.selectClue(this.props.cat, this.props.clueID)}
+					className={this.props.active ? "active" : "inactive"}
+					disabled={!this.props.active ? "disabled" : null}
+				>
 					{this.props.difficulty * 100}
 				</button>
 				{/*

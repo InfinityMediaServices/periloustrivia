@@ -362,6 +362,7 @@ class App extends React.Component {
 					me={me}
 					startGame={this.startGame}
 					selectClue={this.selectClue}
+					gameOn={this.gameOn}
 					isPhase={this.isPhase}
 				/>
 				<PlayBoard
