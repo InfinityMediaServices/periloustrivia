@@ -13,11 +13,11 @@ class GameBoard extends React.Component {
 				<div className="cat-title">{cat.catTitle}</div>
 				{Object.keys(cat.clues).map(clueID => {
 					return (
-						<Clue 
-							key={clueID} 
+						<Clue
+							key={clueID}
 							clueID={clueID}
-							difficulty={parseInt(clueID, 10)} 
-							cat={key}
+							difficulty={parseInt(clueID, 10)}
+							cat={parseInt(key, 10)}
 							clue={cat.clues[clueID].clue}
 							selectClue={this.props.selectClue}
 						/>
@@ -27,21 +27,26 @@ class GameBoard extends React.Component {
 		)
 	}
 	render() {
-		// console.log(this.props);
-		if(!this.props.game.cats){
+		const game = this.props.game;
+		if (!game) {
 			return null;
 		}
-		const catIds = Object.keys(this.props.game.cats);
-		return (
-			<div className="game-board">
-		        {catIds.map(this.renderCategory)}
-			</div>
-		)
+		if (game.round && game.round > 0){
+			const catIds = Object.keys(this.props.game.cats);
+			return (
+				<div className="game-board">
+					{catIds.map(this.renderCategory)}
+				</div>
+			)
+		}
+		return null;
 	}
 }
 
 GameBoard.propTypes = {
 	game: React.PropTypes.object.isRequired,
+	selectClue: React.PropTypes.func.isRequired,
+	isPhase: React.PropTypes.func.isRequired,
 };
 
 export default GameBoard;
