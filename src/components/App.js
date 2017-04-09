@@ -53,12 +53,12 @@ class App extends React.Component {
 	}
 
 	componentWillUnmount() {
-		console.log('unmount');
+		// // console.log('unmount');
 		base.removeBinding(this.ref);
 	}
 
 	componentDidMount() {
-		console.log('component mount');
+		// // console.log('component mount');
 		const slug = this.props.params.gameSlug;
 		base.fetch(`slugs/${slug}`, {
 			context: this,
@@ -67,7 +67,7 @@ class App extends React.Component {
 				base.fetch(`games/${slugData.id}/game`, {
 					context: this,
 					then(data) {
-						console.log('base fetch');
+						// // console.log('base fetch');
 						if (!data) {
 							if (!this.hasInit(this.state.game)) {
 								let game = this.loadSamples(emptyGame);
@@ -79,7 +79,7 @@ class App extends React.Component {
 			}
 		});
 		base.onAuth((user) => {
-			console.log('on Auth');
+			// // console.log('on Auth');
 			if(user) {
 				this.authHandler(null, { user });
 			}
@@ -90,16 +90,16 @@ class App extends React.Component {
 	addUserToGame = false;
 
 	authenticate(provider) {
-		// console.log(`Trying to log in with ${provider}`);
+		// // // console.log(`Trying to log in with ${provider}`);
 		base.authWithOAuthPopup(provider, this.authHandler);
 	}
 
 	logout() {
 		const game = {...this.state.game};
 		const uid = this.state.uid;
-		console.log('game before delete: ', game);
+		// // console.log('game before delete: ', game);
 		game.players[uid] = null;
-		console.log('game after delete: ', game);
+		// // console.log('game after delete: ', game);
 		this.setState({
 			game: game,
 			uid: null,
@@ -109,7 +109,7 @@ class App extends React.Component {
 	}
 
 	authHandler(err, authData)  {
-		// console.log('authData: ', authData);
+		// // // console.log('authData: ', authData);
 		if (err) {
 			console.error(err);
 			return;
@@ -143,11 +143,12 @@ class App extends React.Component {
 	}
 
 	setHelpers() {
-		console.log('Running Set Helpers');
+		// TODO: refactor to call setstate only once
+		// // console.log('Running Set Helpers');
 		const game = {...this.state.game};
 		const names = game.phase.possibleNames;
 		for (var i = 0; i < names.length; i++) {
-			console.log('names[i]: ', names[i]);
+			// // console.log('names[i]: ', names[i]);
 			this.setHelper(names[i], game.phase.name === names[i]);
 		}
 	}
@@ -169,19 +170,19 @@ class App extends React.Component {
 		} else {
 			const name = game.phase.name;
 			// const prop = game.phase['is' + name[0].toUpperCase() + name.slice(1)];
-			// console.log('prop: ', prop);
+			// // // console.log('prop: ', prop);
 			// isIt = game.phase[prop];
 			isIt = name === phase;
-			console.log(game.phase, isIt);
+			// // console.log(game.phase, isIt);
 		}
-		console.log('checking isPhase: ', phase);
+		// // console.log('checking isPhase: ', phase);
 		return isIt;
 	}
 
 	hasInit(game) {
 		game = game || this.state.game || {};
-		console.log('hasInit');
-		console.log('this.state.game: ', this.state.game);
+		// // console.log('hasInit');
+		// // console.log('this.state.game: ', this.state.game);
 		if (!this.state.game || !this.state.game.phase) {
 			return false;
 		}
@@ -243,43 +244,57 @@ class App extends React.Component {
 		this.setState({ game });
 	}
 
-	startGame() {
+	startGame(me) {
 		const game = {...this.state.game};
-		const user = {...this.state.user};
-		const me = this.getMe();
-		me.isReady = true;
-		me.score = 0;
-		// check that all users are ready
 		const players = Object.keys(game.players);
-		let allGood = true;
-		players.forEach(player => {
-			if(!game.players[player].isReady){
-				allGood = false;
+		// // console.log('me in startGame: ', me);
+
+		// set me to ready and set score to 0
+		this.setMe('isReady',  true);
+		this.setMe('score',  0);
+		// check that all users are ready
+		let allGood = players.reduce((allGood, player) => {
+			if (allGood === false) {
+				return false;
 			}
-		});
-		if (Object.keys(players).length < 2) {
+			if(!game.players[player].isReady){
+				return false;
+			}
+			return allGood;
+		}, true);
+		// are there enough players?
+		if (players.length < 2) {
 			allGood = false;
 		}
+
+		console.log('allGood: ', allGood);
 		if (allGood) {
-			console.log('all good');
-			this.setActivePlayer(game.owner);
-			this.setPhase('clueSelection');
+			console.log(`all good setActivePlayer to ${game.owner}`);
 			game.round = 1;
+			game.activePlayer = game.owner;
+			game.phase.name = 'clueSelection';
+			game.phase.isClueSelection = true;
+			this.setState({game}, function(){
+				// has to be set AFTER previous so as to not to collide state objects
+				console.log('state set');
+			});
+				// this.setPhase('clueSelection');
 		} else {
-			console.log('waiting on someone');
+			// // console.log('waiting on someone');
 		}
-		this.setState({ game, user });
 	}
 
-	setActivePlayer(player) {
+	setActivePlayer(uid) {
+		// // console.log('uid: ', uid);
 		const game = {...this.state.game};
-		game.activePlayer = game.players[player].uid;
+		game.activePlayer = uid;
+		// // console.log('game in setActivePlayer: ', game);
 		this.setState({game});
 	}
 
 	loadSamples(game) {
-		console.log('Load Samples');
-		console.log('game: ', game);
+		// // console.log('Load Samples');
+		// // console.log('game: ', game);
 		// const game = this.state.game;
 		const clues = sampleClues;
 		// game.rounds = emptyGame.rounds;
@@ -310,7 +325,7 @@ class App extends React.Component {
 		}
 		game.owner = this.state.uid;
 
-		console.log('game at fn end: ', game);
+		// // console.log('game at fn end: ', game);
 		return game;
 	}
 
@@ -330,7 +345,7 @@ class App extends React.Component {
 
 	render() {
 		let me = {};
-		console.log('this.state.game: ', this.state.game);
+		// // console.log('this.state.game: ', this.state.game);
 
 		if(this.state.uid && this.state.game && this.state.game.players && this.state.game.players[this.state.uid]) {
 			me = this.state.game.players[this.state.uid];
@@ -352,11 +367,12 @@ class App extends React.Component {
 				</nav>
 				<ScoreBoard
 					game={this.state.game}
+					me={me}
 					joinGame={this.joinGame}
 					startGame={this.startGame}
-					me={me}
 					player={this.state.user}
 				/>
+				{/* TODO: refactor out player prop  in ScoreBoard */}
 				<GameBoard
 					game={this.state.game}
 					me={me}
@@ -367,6 +383,7 @@ class App extends React.Component {
 				/>
 				<PlayBoard
 					game={this.state.game}
+					me={me}
 				/>
 
 

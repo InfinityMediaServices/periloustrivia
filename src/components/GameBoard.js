@@ -18,12 +18,12 @@ class GameBoard extends React.Component {
 					return (
 						<Clue
 							key={clueID}
-							clueID={clueID}
-							difficulty={parseInt(clueID, 10)}
 							cat={parseInt(key, 10)}
 							clue={cat.clues[clueID].clue}
+							clueID={clueID}
+							difficulty={parseInt(clueID, 10)}
 							selectClue={this.props.selectClue}
-							active={this.props.game.phase.name === 'clueSelection'}
+							active={this.props.game.phase.name === 'clueSelection' && this.props.game.activePlayer === this.props.me.uid}
 						/>
 					)
 				})}

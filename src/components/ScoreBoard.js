@@ -4,14 +4,17 @@ class ScoreBoard extends React.Component {
 
 	constructor() {
 		super();
-		this.renderCTA = this.renderCTA.bind(this);
-		this.renderSummary = this.renderSummary.bind(this);
+		this.renderCTA          = this.renderCTA.bind(this);
+		this.renderPlayerList   = this.renderPlayerList.bind(this);
+		this.renderSummary      = this.renderSummary.bind(this);
+		this.renderDefault      = this.renderDefault.bind(this);
+		this.renderPlayerSelect = this.renderPlayerSelect.bind(this);
 	}
 
 	renderCTA() {
 		const game = this.props.game;
 		const me = this.props.me;
-		console.log('me: ', me);
+		// console.log('me: ', me);
 		const player = this.props.player;
 		if(!player || !player.uid){
 			return <li> Login above to join game </li>
@@ -30,6 +33,7 @@ class ScoreBoard extends React.Component {
 		const game = this.props.game;
 		const me = this.props.me;
 		const playerCount = Object.keys(game.players).length;
+		// console.log('this.props.startGame: ', this.props.startGame);
 
 		return (<ul>
 			{Object.keys(game.players).map(key => {
@@ -38,7 +42,7 @@ class ScoreBoard extends React.Component {
 					return null
 				}
 				let subText = null;
-				console.log('game.players[key]: ', game.players[key]);
+				// console.log('game.players[key]: ', game.players[key]);
 				if(game.round > 0) {
 					subText = "$" + score;
 
@@ -49,14 +53,15 @@ class ScoreBoard extends React.Component {
 				} else {
 					subText = "Waiting to confirm readiness to play";
 				}
-				console.log('me.isReady: ', me.isReady);
+				// console.log('me.isReady: ', me.isReady);
 				return (
 					<li key={key} className={key === me.uid ? 'player-me' : 'player-other'}>
-						{game.players[key].displayName}
+						{/*game.players[key].displayName*/}
+						{game.players[key].email}
 						{key === me.uid ? <span className="is-self"> (you) </span> : null}
 						<span> </span>
 						<strong>{ subText }</strong>
-						{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button> </span> : ''}
+						{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(me);  }}> Press Here to begin </button> </span> : ''}
 					</li>
 				)
 			})}
@@ -67,8 +72,9 @@ class ScoreBoard extends React.Component {
 
 	renderSummary() {
 		const game = this.props.game;
+		// console.log('game in renderSummary: ', game);
+		if (!game.round && game.players) {
 		const playerCount = Object.keys(game.players).length;
-		if (!game.round) {
 			return (<div>
 				<h2>There are now {playerCount} players.</h2>
 				{playerCount < 4 ? <p>You can add up to 4 players</p> : ''}
@@ -100,13 +106,19 @@ class ScoreBoard extends React.Component {
 		const game = this.props.game;
 		// render phases
 		// first return the null phases
-		if(!game || !game.phase || !game.phase.name){
+		if(!game ||
+			!game.phase ||
+			!game.phase.name ||
+			game.round === undefined ||
+			!game.players
+		){
 			return null;
 		}
-		// now return the different phase
+		// now return the different phases
 		if(game.phase.isPlayerSelect){
 			return this.renderPlayerSelect();
 		}
+		// now return the default phases
 		return this.renderDefault();
 	}
 }
