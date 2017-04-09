@@ -104,7 +104,7 @@ class ScoreBoard extends React.Component {
 			return null;
 		}
 		// now return the different phase
-		if(game.phase.name === 'playerSelect'){
+		if(game.phase.isPlayerSelect){
 			return this.renderPlayerSelect();
 		}
 		return this.renderDefault();
