@@ -25,6 +25,46 @@ class ScoreBoard extends React.Component {
 		}
 		return ''
 	}
+
+	renderPlayerList() {
+		const game = this.props.game;
+		const me = this.props.me;
+		const playerCount = Object.keys(game.players).length;
+
+		return (<ul>
+			{Object.keys(game.players).map(key => {
+				const score = game.players[key].score || 0;
+				if (!game.players[key]) {
+					return null
+				}
+				let subText = null;
+				console.log('game.players[key]: ', game.players[key]);
+				if(game.round > 0) {
+					subText = "$" + score;
+
+				} else if(game.players[key].isReady) {
+					subText = "Confirmed and ready to play";
+				} else if (playerCount < 2) {
+					subText = "Waiting for other players to join";
+				} else {
+					subText = "Waiting to confirm readiness to play";
+				}
+				console.log('me.isReady: ', me.isReady);
+				return (
+					<li key={key} className={key === me.uid ? 'player-me' : 'player-other'}>
+						{game.players[key].displayName}
+						{key === me.uid ? <span className="is-self"> (you) </span> : null}
+						<span> </span>
+						<strong>{ subText }</strong>
+						{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button> </span> : ''}
+					</li>
+				)
+			})}
+			{ this.renderCTA() }
+		</ul>)
+
+	}
+
 	renderSummary() {
 		const game = this.props.game;
 		const playerCount = Object.keys(game.players).length;
@@ -39,59 +79,35 @@ class ScoreBoard extends React.Component {
 		return null;
 	}
 
-	render() {
-		const game = this.props.game;
-		const me = this.props.me;
-		if (!game.players) {
-			return <div className="score-board"></div>
-		}
-		const playerCount = Object.keys(game.players).length;
+	renderDefault(){
 		return (
 			<div className="score-board">
 				<h2>ScoreBoard </h2>
 				<div className="players">
 					<h3>Players</h3>
-					<ul>
-						{Object.keys(game.players).map(key => {
-							const score = game.players[key].score || 0;
-							if (!game.players[key]) {
-								return null
-							}
-							let subText = null;
-							console.log('game.players[key]: ', game.players[key]);
-							if(game.round > 0) {
-								subText = "$" + score;
-
-							} else if(game.players[key].isReady) {
-								subText = "Confirmed and ready to play";
-							} else if (playerCount < 2) {
-								subText = "Waiting for other players to join";
-							} else {
-								subText = "Waiting to confirm readiness to play";
-							}
-							console.log('me.isReady: ', me.isReady);
-							return (
-								<li key={key} className={key === me.uid ? 'player-me' : 'player-other'}>
-									{/*
-										<div className="playerImg">
-										<img src={game.players[key].photoURL} alt={game.players[key].displayName}/>
-										</div>
-									*/}
-									{game.players[key].displayName}
-									{key === me.uid ? <span className="is-self"> (you) </span> : null}
-									<span> </span>
-									<strong>{ subText }</strong>
-									{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(this.props.me);  }}>Press Here to begin</button> </span> : ''}
-								</li>
-							)
-						})}
-						{ this.renderCTA() }
-					</ul>
 					{ this.renderSummary() }
-
+					{ this.renderPlayerList() }
 				</div>
 			</div>
 		)
+	}
+
+	renderPlayerSelect(){
+		return null;
+	}
+
+	render() {
+		const game = this.props.game;
+		// render phases
+		// first return the null phases
+		if(!game || !game.phase || !game.phase.name){
+			return null;
+		}
+		// now return the different phase
+		if(game.phase.name === 'playerSelect'){
+			return this.renderPlayerSelect();
+		}
+		return this.renderDefault();
 	}
 }
 
