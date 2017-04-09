@@ -11,22 +11,16 @@ class Clue extends React.Component {
 				>
 					{this.props.difficulty * 100}
 				</button>
-				{/*
-				<div className="clue-view">
-					<div className="clue-text">
-						{this.props.clue}
-					</div>
-				</div>
-				*/}
 			</div>
 		)
 	}
 	static propTypes = {
-		clueID: React.PropTypes.string.isRequired, // {clueID}
-		difficulty: React.PropTypes.number.isRequired, // {parseInt(clueID, 10)}
 		cat: React.PropTypes.number.isRequired, // {key}
 		clue: React.PropTypes.string.isRequired, // {cat.clues[clueID].clue}
+		clueID: React.PropTypes.string.isRequired, // {clueID}
+		difficulty: React.PropTypes.number.isRequired, // {parseInt(clueID, 10)}
 		selectClue: React.PropTypes.func.isRequired, // {this.props.selectClue}
+		active: React.PropTypes.bool.isRequired, // {this.props.selectClue}
 	};
 }
 
