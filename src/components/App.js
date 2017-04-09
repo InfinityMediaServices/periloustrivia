@@ -263,7 +263,7 @@ class App extends React.Component {
 		if (allGood) {
 			console.log('all good');
 			this.setActivePlayer(game.owner);
-			this.setPhase('gameIntro');
+			this.setPhase('clueSelection');
 			game.round = 1;
 		} else {
 			console.log('waiting on someone');
