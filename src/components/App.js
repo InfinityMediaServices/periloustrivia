@@ -6,15 +6,14 @@ import PlayBoard from './PlayBoard';
 import emptyGame from '../empty-game';
 import sampleClues from '../clues';
 import ScoreBoard from './ScoreBoard';
+import StatusBar from './StatusBar';
 // import Buzzer from './Buzzer';
 // import Timer from './Timer';
-// import StatusBar from './StatusBar';
 
 class App extends React.Component {
 	constructor() {
 		super();
-		this.setHelper             = this.setHelper.bind(this);
-		this.setHelpers            = this.setHelpers.bind(this);
+		this.getHelperString             = this.getHelperString.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
 		this.hasInit               = this.hasInit.bind(this);
@@ -84,6 +83,7 @@ class App extends React.Component {
 				this.authHandler(null, { user });
 			}
 		});
+		console.log('this.setState: ', this.setState);
 	}
 
 	// in case the game is created before the auth callback
@@ -136,30 +136,24 @@ class App extends React.Component {
 
 
 
-	setHelper(name, state) {
-		const game = {...this.state.game};
-		game.phase['is' + name[0].toUpperCase() + name.slice(1)] = state;
-		this.setState({ game });
-	}
-
-	setHelpers() {
-		// TODO: refactor to call setstate only once
-		// // console.log('Running Set Helpers');
-		const game = {...this.state.game};
-		const names = game.phase.possibleNames;
-		for (var i = 0; i < names.length; i++) {
-			// // console.log('names[i]: ', names[i]);
-			this.setHelper(names[i], game.phase.name === names[i]);
-		}
+	getHelperString(name) {
+		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
 	setPhase(phase) {
 		const game = {...this.state.game};
 		game.phase.name = phase;
-		this.setHelper(phase, true);
-		this.setHelpers();
-		this.setState({ game });
-		return;
+		game.phase[this.getHelperString(phase)] = true;
+		const names = game.phase.possibleNames;
+		for (var i = 0; i < names.length; i++) {
+			game.phase[this.getHelperString(names[i])] = game.phase.name === names[i];
+		}
+		console.log(`setting phase to: ${phase}`);
+		this.setState({
+			game: { phase: game.phase }
+		}, () => {
+			console.log('just set phase');
+		});
 	}
 
 	isPhase(phase) {
@@ -214,13 +208,15 @@ class App extends React.Component {
 	}
 
 	selectClue(cat, clue) {
-		const game = {...this.state.game};
-		game.currentClue = {
-			cat: cat,
-			clue: clue
-		};
+		this.setState({
+			game: {
+				currentClue: {
+					cat: cat,
+					clue: clue
+				}
+			}
+		});
 		this.setPhase('cluePresentation');
-		this.setState({ game });
 	}
 
 	buzzIn() {
@@ -241,7 +237,11 @@ class App extends React.Component {
 			uid: user.uid,
 			photoURL: user.photoURL,
 		};
-		this.setState({ game });
+		this.setState({
+			game: {
+				players: game.players
+			}
+		});
 	}
 
 	startGame(me) {
@@ -385,13 +385,16 @@ class App extends React.Component {
 					game={this.state.game}
 					me={me}
 				/>
+				<StatusBar
+					game={this.state.game}
+					me={me}
+				/>
 
 
 
 				{/*
 				<Buzzer />
 				<Timer />
-				<StatusBar />
 				*/}
 			</div>
 		)
