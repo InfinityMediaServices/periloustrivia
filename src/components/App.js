@@ -7,13 +7,14 @@ import emptyGame from '../empty-game';
 import sampleClues from '../clues';
 import ScoreBoard from './ScoreBoard';
 import StatusBar from './StatusBar';
-// import Buzzer from './Buzzer';
-// import Timer from './Timer';
+import Buzzer from './Buzzer';
+import Timer from './Timer';
 
 class App extends React.Component {
 	constructor() {
 		super();
-		this.getHelperString             = this.getHelperString.bind(this);
+		this.base                  = base;
+		this.getHelperString       = this.getHelperString.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
 		this.hasInit               = this.hasInit.bind(this);
@@ -21,6 +22,7 @@ class App extends React.Component {
 		this.joinGame              = this.joinGame.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
@@ -32,7 +34,14 @@ class App extends React.Component {
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || { game: {} }
+		this.state                 = this.state || {
+			game: {},
+			timer: {
+				i: 0, // interval
+				d: 0, // duration
+				e: 0, // elapsed
+			}
+		}
 	}
 	componentWillMount() {
 		// this runs right before the <App> is rendered
@@ -217,14 +226,72 @@ class App extends React.Component {
 			}
 		});
 		this.setPhase('cluePresentation');
+		this.timerToNewPhase('buzzIn', 5000);
+		// set timer
+	}
+
+	timerToNewPhase(phase, duration = 5000, tick = 1000) {
+		const timer = {...this.state.timer};
+		clearInterval(timer.i);
+		timer.i = setInterval(() => {
+			const timer = {...this.state.timer};
+			let done = false;
+			timer.e += tick;
+			if (timer.e >= timer.d) {
+				timer.e = timer.d;
+				clearInterval(timer.i);
+				done = true;
+			}
+			this.setState({ timer });
+			if (done) {
+				this.setPhase(phase);
+			}
+		}, tick);
+		timer.d = duration;
+		timer.e = 0;
+		this.setState({ timer });
 	}
 
 	buzzIn() {
+		const game = {...this.state.game};
+		const me = this.getMe();
+		let newGame = {};
 		base.push(`games/${this.slugID}/game/buzzes`, {
 			data: {
 				uid: this.state.uid,
 				timestamp: base.database.ServerValue.TIMESTAMP
 			}
+		}).then(ref => {
+			console.log('ref.key: ', ref.key);
+
+			base.fetch(`games/${this.slugID}/game/buzzes`, {
+				context: this,
+				asArray: true
+			}).then(data => {
+				let winner = data.sort((a, b) => {
+					return a.timestamp < b.timestamp ? -1 : 1;
+				})[0];
+				if(me.uid === winner.uid){
+					newGame.activePlayer = winner.uid;
+					newGame.lastActivePlayer = game.activePlayer;
+					this.setState({ game: newGame });
+					this.setPhase('questionSelect')
+					// clear buzzes
+					base.update(`games/${this.slugID}/game`, {
+						data: { buzzes:null }
+					}).then(() => {
+						console.log('removed buzzes');
+					})
+				}
+				// console.table(buzzIns)
+			}).catch(error => {
+				//handle error
+			})
+
+
+
+		}).catch(err => {
+			// handle error
 		});
 	}
 
@@ -389,13 +456,19 @@ class App extends React.Component {
 					game={this.state.game}
 					me={me}
 				/>
-
-
-
-				{/*
-				<Buzzer />
-				<Timer />
-				*/}
+				<Timer
+					game={this.state.game}
+					me={me}
+					total={10}
+					progress={1}
+					timer={this.state.timer}
+				/>
+				<Buzzer
+					game={this.state.game}
+					me={me}
+					isPhase={this.isPhase}
+					buzzIn={this.buzzIn}
+				/>
 			</div>
 		)
 	}

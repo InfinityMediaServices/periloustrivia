@@ -9,7 +9,14 @@ class StatusBar extends React.Component {
 		let msg = '';
 		const phase = this.props.game.phase;
 		if(phase.isClueSelection){
-			msg = me.uid === game.activePlayer ? 'You have control of the board.  Please select a clue.' : game.players[me.uid].displayName + ' has contol of the board';
+			msg = me.uid === game.activePlayer ?
+				'You have control of the board.  Please select a clue.' :
+				game.players[me.uid].displayName + ' has contol of the board';
+		} else if (phase.isQuestionSelect) {
+			msg = me.uid === game.activePlayer ?
+				'Please Pick a question.' :
+				game.players[me.uid].displayName + ' is attempting to answer';
+
 		}
 		return (
 			<div className="status-bar">
