@@ -19,6 +19,7 @@ class App extends React.Component {
 		this.isPhase               = this.isPhase.bind(this);
 		this.hasInit               = this.hasInit.bind(this);
 		this.selectClue            = this.selectClue.bind(this);
+		this.selectQuestion        = this.selectQuestion.bind(this);
 		this.joinGame              = this.joinGame.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
@@ -228,6 +229,46 @@ class App extends React.Component {
 		this.setPhase('cluePresentation');
 		this.timerToNewPhase('buzzIn', 5000);
 		// set timer
+	}
+
+	selectQuestion(q) {
+		const game = {...this.state.game};
+		const me = this.getMe();
+		const cCat = parseInt(game.currentClue.cat, 10);
+		const cClue = parseInt(game.currentClue.clue, 10);
+		let clue = game.cats[cCat].clues[cClue];
+		clue.guesses = clue.guesses || [];
+		// log the guess
+		clue.guesses.push({
+			uid: me.uid,
+			q: q
+		});
+		game.cats[cCat].clues[cClue] = clue;
+		// TODO:
+		// set phase to results
+		// playboard renders results
+		// timeout to score adjustment
+		// calculate and apply
+		// timeout to either buzz in or clue selection
+		//
+
+
+
+
+
+		this.setState({
+			game: {
+				cats: game.cats
+			}
+		});
+
+
+		// let newGame = {};
+		// newGame.cats = [];
+		// newGame.cats[cCat] = { clues: [] };
+		// newGame.cats[cCat].clues[cClue] = { guesses: clue.guesses };
+		// console.log('newGame.cats[cCat].clues[cClue].guesses: ', newGame.cats[cCat].clues[cClue].guesses);
+		// console.log('newGame: ', newGame);
 	}
 
 	timerToNewPhase(phase, duration = 5000, tick = 1000) {
@@ -451,6 +492,7 @@ class App extends React.Component {
 				<PlayBoard
 					game={this.state.game}
 					me={me}
+					selectQuestion={this.selectQuestion}
 				/>
 				<StatusBar
 					game={this.state.game}
