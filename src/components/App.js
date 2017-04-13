@@ -30,7 +30,7 @@ class App extends React.Component {
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
-		this.cancelTimer           = this.cancelTimer.bind(this);
+		this.cancelTimers           = this.cancelTimers.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
@@ -225,7 +225,7 @@ class App extends React.Component {
 			},
 			results : function(){
 				console.log('results did begin');
-				that.cancelTimer();
+				that.cancelTimers();
 				that.calculateResults();
 				//
 			},
@@ -418,14 +418,14 @@ class App extends React.Component {
 				e: 0, // elapsed
 			};
 		}
-		clearInterval(timer.i);
+		this.cancelTimers();
 		timer.i = setInterval(() => {
 			const timer = {...this.state.game.timer};
 			let done = false;
 			timer.e += tick;
 			if (timer.e >= timer.d) {
 				timer.e = timer.d;
-				clearInterval(timer.i);
+				this.cancelTimers();
 				done = true;
 			}
 			this.setState({ game: { timer: timer } });
@@ -438,9 +438,19 @@ class App extends React.Component {
 		this.setState({ game: { timer: timer } });
 	}
 
-	cancelTimer(){
+	cancelTimers(){
 		let i = this.state.game.timer.i;
-		clearInterval(i);
+
+
+		let tempID = setTimeout(function() {}, 0);
+		while (tempID--) {
+		    clearTimeout(tempID); // will do nothing if no timeout with tempID is present
+		}
+		tempID = setInterval(function() {}, 0);
+		while (tempID--) {
+		    clearInterval(tempID); // will do nothing if no interval with tempID is present
+		}
+
 		this.setState({ game: { timer: {
 			i: i, // interval
 			d: 0, // duration
@@ -449,7 +459,7 @@ class App extends React.Component {
 	}
 
 	buzzIn() {
-		this.cancelTimer();
+		this.cancelTimers();
 		const game = {...this.state.game};
 		const me = this.getMe();
 		let newGame = {};
