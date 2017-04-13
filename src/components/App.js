@@ -15,15 +15,22 @@ class App extends React.Component {
 		super();
 		this.base                  = base;
 		this.getHelperString       = this.getHelperString.bind(this);
+		this.getTimeoutDuration    = this.getTimeoutDuration.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
+		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
+		this.calculateResults      = this.calculateResults.bind(this);
+		this.getActiveClue         = this.getActiveClue.bind(this);
+		this.setActiveClue         = this.setActiveClue.bind(this);
 		this.hasInit               = this.hasInit.bind(this);
 		this.selectClue            = this.selectClue.bind(this);
 		this.selectQuestion        = this.selectQuestion.bind(this);
 		this.joinGame              = this.joinGame.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.updateScore           = this.updateScore.bind(this);
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
+		this.cancelTimer           = this.cancelTimer.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
@@ -35,14 +42,7 @@ class App extends React.Component {
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || {
-			game: {},
-			timer: {
-				i: 0, // interval
-				d: 0, // duration
-				e: 0, // elapsed
-			}
-		}
+		this.state                 = this.state || { game: {} }
 	}
 	componentWillMount() {
 		// this runs right before the <App> is rendered
@@ -150,7 +150,22 @@ class App extends React.Component {
 		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
-	setPhase(phase) {
+	getTimeoutDuration(phase){
+		const game = {...this.state.game};
+		phase = phase || game.phase.name;
+		return {
+			playerSelect    : 0,
+			clueSelection   : 0,
+			cluePresentation: 3000,
+			buzzIn          : 5000,
+			questionSelect  : 7000,
+			results         : 3000,
+			scoreAdjustment : 3000,
+			init            : 0
+		}[phase];
+	}
+
+	setPhase(phase, callback) {
 		const game = {...this.state.game};
 		game.phase.name = phase;
 		game.phase[this.getHelperString(phase)] = true;
@@ -164,6 +179,10 @@ class App extends React.Component {
 		}, () => {
 			console.log('just set phase');
 		});
+		if (callback instanceof Function) {
+			callback.call();
+		}
+		this.phaseDidBegin();
 	}
 
 	isPhase(phase) {
@@ -181,6 +200,123 @@ class App extends React.Component {
 		}
 		// // console.log('checking isPhase: ', phase);
 		return isIt;
+	}
+
+	phaseDidBegin(){
+		// const game = {...this.state.game};
+		const that = this;
+		const callbacks = {
+			playerSelect : function(){
+				console.log('playerSelect did begin');
+			},
+			clueSelection : function(){
+				console.log('clueSelection did begin');
+			},
+			cluePresentation : function(){
+				console.log('cluePresentation did begin');
+			},
+			buzzIn : function(){
+				console.log('buzzIn did begin');
+				that.timerToNewPhase('results', that.getTimeoutDuration('buzzIn'));
+			},
+			questionSelect : function(){
+				console.log('questionSelect did begin');
+				that.timerToNewPhase('results', that.getTimeoutDuration('questionSelect'));
+			},
+			results : function(){
+				console.log('results did begin');
+				that.cancelTimer();
+				that.calculateResults();
+				//
+			},
+			scoreAdjustment : function(){
+				console.log('scoreAdjustment did begin');
+			},
+			init : function(){
+				console.log('init did begin');
+			}
+		}
+		callbacks[this.state.game.phase.name].call();
+
+	}
+
+	getActiveClue() {
+		const game = this.state.game;
+		return game.cats[game.currentClue.cat].clues[game.currentClue.clue];
+
+	}
+
+	setActiveClue(clue) {
+		const game = {...this.state.game};
+		game.cats[game.currentClue.cat].clues[game.currentClue.clue] = clue;
+		this.setState({
+			game: {
+				cats: game.cats
+			}
+		})
+
+	}
+
+	calculateResults(){
+		const game = {...this.state.game};
+		const me = this.getMe();
+		const round = parseInt(game.round, 10);
+		const worth = parseInt(game.currentClue.clue, 10) * round * 100;
+		console.log('worth: ', worth);
+
+		// am I the activePlayer?
+		if (! me.uid === game.activePlayer) {
+			// only calc by active player
+			return;
+		}
+		let clue = this.getActiveClue();
+		let newPhase;
+		clue.losers = clue.losers  || [];
+		console.log('clue: ', clue);
+		// are there any new guessers?
+		let guesser = !clue.guessers ? false : clue.guessers.find((guesser, index) => {
+			const dead = guesser.dead;
+			clue.guessers[index].dead = true;
+			return dead !== true;
+		});
+		console.log('guesser: ', guesser);
+		// now guesser will be either false, undefined or an {}
+		if(!guesser) {
+			// no new guesser means nobody buzzed in
+			// no score to alter
+			// set clue to dead and go back to the clueSelection phase
+			clue.dead = true;
+			newPhase = 'clueSelection';
+		} else {
+			// i have a buzz
+			// did I win?
+			let winner = !clue.guesses ? false : clue.guesses.find((guess, index) => {
+				const win = guess.q === clue.cq;
+				clue.guesses[index].dead = true;
+				return win;
+			});
+			if (!winner) {
+				// i lost deduct score and add me to the wall of shame
+				clue.losers.push({uid: me.uid});
+				this.updateScore(me.uid, worth * -1);
+				newPhase = 'buzzIn';
+				this.setActivePlayer(game.lastActivePlayer);
+			} else {
+				// chicken dinner!!!
+				clue.winner = winner.uid;
+				this.updateScore(winner.uid, worth);
+				newPhase = 'clueSelection';
+				clue.dead = true;
+			}
+			console.log('winner: ', winner);
+
+		}
+		this.setActiveClue(clue);
+		this.timerToNewPhase(newPhase, this.getTimeoutDuration('results'));
+
+
+
+
 	}
 
 	hasInit(game) {
@@ -227,7 +363,7 @@ class App extends React.Component {
 			}
 		});
 		this.setPhase('cluePresentation');
-		this.timerToNewPhase('buzzIn', 5000);
+		this.timerToNewPhase('buzzIn', this.getTimeoutDuration('cluePresentation'));
 		// set timer
 	}
 
@@ -250,7 +386,6 @@ class App extends React.Component {
 		// timeout to score adjustment
 		// calculate and apply
 		// timeout to either buzz in or clue selection
-		//
 
 
 
@@ -262,6 +397,8 @@ class App extends React.Component {
 			}
 		});
 
+		this.setPhase('results');
+
 
 		// let newGame = {};
 		// newGame.cats = [];
@@ -271,11 +408,19 @@ class App extends React.Component {
 		// console.log('newGame: ', newGame);
 	}
 
-	timerToNewPhase(phase, duration = 5000, tick = 1000) {
-		const timer = {...this.state.timer};
+	timerToNewPhase(phase, duration = false, tick = 1000) {
+		duration = duration === false ? this.getTimeoutDuration(phase) : duration;
+		let timer = {...this.state.game.timer};
+		if(timer.i === undefined){
+			timer = {
+				i: 0, // interval
+				d: 0, // duration
+				e: 0, // elapsed
+			};
+		}
 		clearInterval(timer.i);
 		timer.i = setInterval(() => {
-			const timer = {...this.state.timer};
+			const timer = {...this.state.game.timer};
 			let done = false;
 			timer.e += tick;
 			if (timer.e >= timer.d) {
@@ -283,17 +428,28 @@ class App extends React.Component {
 				clearInterval(timer.i);
 				done = true;
 			}
-			this.setState({ timer });
+			this.setState({ game: { timer: timer } });
 			if (done) {
 				this.setPhase(phase);
 			}
 		}, tick);
 		timer.d = duration;
 		timer.e = 0;
-		this.setState({ timer });
+		this.setState({ game: { timer: timer } });
+	}
+
+	cancelTimer(){
+		let i = this.state.game.timer.i;
+		clearInterval(i);
+		this.setState({ game: { timer: {
+			i: i, // interval
+			d: 0, // duration
+			e: 0, // elapsed
+		} } });
 	}
 
 	buzzIn() {
+		this.cancelTimer();
 		const game = {...this.state.game};
 		const me = this.getMe();
 		let newGame = {};
@@ -313,8 +469,16 @@ class App extends React.Component {
 					return a.timestamp < b.timestamp ? -1 : 1;
 				})[0];
 				if(me.uid === winner.uid){
-					newGame.activePlayer = winner.uid;
+					// set activePlayer to me
+					newGame.activePlayer = me.uid;
+					// set lastActivePlayer to previous activePlayer
 					newGame.lastActivePlayer = game.activePlayer;
+					// add me to guessers array
+					newGame.cats = game.cats;
+					newGame.cats[game.currentClue.cat].clues[game.currentClue.clue].guessers =
+					newGame.cats[game.currentClue.cat].clues[game.currentClue.clue].guessers || [];
+					newGame.cats[game.currentClue.cat].clues[game.currentClue.clue].guessers.push({ uid: me.uid });
+					// update state
 					this.setState({ game: newGame });
 					this.setPhase('questionSelect')
 					// clear buzzes
@@ -392,12 +556,25 @@ class App extends React.Component {
 		}
 	}
 
-	setActivePlayer(uid) {
-		// // console.log('uid: ', uid);
+	setActivePlayer(uid, resetLastActive = false) {
+		if (!Object.keys(this.state.game.players).includes(uid)) {
+			return false;
+		}
+		let newGame = {};
+		newGame.activePlayer = uid;
+		if(resetLastActive){
+			newGame.lastActivePlayer = null;
+		}
+		this.setState({ game: newGame });
+	}
+
+	updateScore(uid, delta) {
 		const game = {...this.state.game};
-		game.activePlayer = uid;
-		// // console.log('game in setActivePlayer: ', game);
-		this.setState({game});
+		if(!game.players[uid]) {
+			return false
+		}
+		game.players[uid].score += delta;
+		this.setState({ game: { players: game.players }});
 	}
 
 	loadSamples(game) {
@@ -456,7 +633,7 @@ class App extends React.Component {
 		// // console.log('this.state.game: ', this.state.game);
 
 		if(this.state.uid && this.state.game && this.state.game.players && this.state.game.players[this.state.uid]) {
-			me = this.state.game.players[this.state.uid];
+			me = this.getMe();
 		}
 		return (
 			<div className="perilious-trivia">
@@ -503,13 +680,14 @@ class App extends React.Component {
 					me={me}
 					total={10}
 					progress={1}
-					timer={this.state.timer}
+					timer={this.state.game.timer}
 				/>
 				<Buzzer
 					game={this.state.game}
 					me={me}
 					isPhase={this.isPhase}
 					buzzIn={this.buzzIn}
+					getActiveClue={this.getActiveClue}
 				/>
 			</div>
 		)

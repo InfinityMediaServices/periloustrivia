@@ -10,18 +10,20 @@ class GameBoard extends React.Component {
 	}
 
 	renderCategory(key) {
+		key = parseInt(key, 10);
 		const cat = this.props.game.cats[key];
 		return (
 			<div key={key} className={`category cat cat-${key}`}>
 				<div className="cat-title">{cat.catTitle}</div>
 				{Object.keys(cat.clues).map(clueID => {
+					clueID = parseInt(clueID, 10);
 					return (
 						<Clue
 							key={clueID}
-							cat={parseInt(key, 10)}
-							clue={cat.clues[clueID].clue}
+							catID={key}
 							clueID={clueID}
-							difficulty={parseInt(clueID, 10)}
+							clue={cat.clues[clueID]}
+							difficulty={clueID}
 							selectClue={this.props.selectClue}
 							active={this.props.game.phase.name === 'clueSelection' && this.props.game.activePlayer === this.props.me.uid}
 						/>

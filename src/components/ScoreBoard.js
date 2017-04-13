@@ -44,7 +44,7 @@ class ScoreBoard extends React.Component {
 				let subText = null;
 				// console.log('game.players[key]: ', game.players[key]);
 				if(game.round > 0) {
-					subText = "$" + score;
+					subText = (score < 0 ? '-' : '') + "$" + Math.abs(score);
 
 				} else if(game.players[key].isReady) {
 					subText = "Confirmed and ready to play";

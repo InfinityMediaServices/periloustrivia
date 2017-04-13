@@ -5,6 +5,7 @@ class PlayBoard extends React.Component {
 	constructor() {
 		super();
 		this.renderCluePresentation = this.renderCluePresentation.bind(this);
+		this.renderBuzzIn           = this.renderBuzzIn.bind(this);
 		this.renderQuestionSelect   = this.renderQuestionSelect.bind(this);
 	}
 
@@ -16,6 +17,10 @@ class PlayBoard extends React.Component {
 				<h2>{clue.clue}</h2>
 			</div>
 		)
+	}
+
+	renderBuzzIn(){
+		return this.renderCluePresentation();
 	}
 
 	renderQuestionSelect(){
@@ -59,6 +64,8 @@ class PlayBoard extends React.Component {
 
 		if(phase.isCluePresentation){
 			return this.renderCluePresentation()
+		} else if(phase.isBuzzIn){
+			return this.renderBuzzIn()
 		} else if(phase.isQuestionSelect){
 			return this.renderQuestionSelect()
 		}

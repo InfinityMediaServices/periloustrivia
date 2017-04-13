@@ -2,15 +2,18 @@ import React from 'react';
 
 class Buzzer extends React.Component {
   render() {
-		const game    = this.props.game;
-		const me      = this.props.me;
-		const isPhase = this.props.isPhase;
-		const buzzIn  = this.props.buzzIn;
+		const game          = this.props.game;
+		const me            = this.props.me;
+		const isPhase       = this.props.isPhase;
+		const buzzIn        = this.props.buzzIn;
+		const getActiveClue = this.props.getActiveClue;
 
   	if(!game || !game.phase) {
   		return null;
   	}
-		const isDisabled  = !isPhase('buzzIn');
+		const clue          = this.props.getActiveClue();
+  	clue.losers = clue.losers || [{uid: false}];
+		const isDisabled  = !isPhase('buzzIn') || clue.losers.some(loser => loser.uid === me.uid);
     return (
     	<div className={ isDisabled ? "buzzer inactive" : "buzzer active" }>
 	      <h2>Buzzer</h2>
