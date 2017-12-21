@@ -1,5 +1,6 @@
 build/
 node_modules/
+src/.htaccess
 *.css
 *.zip
 .DS_Store
