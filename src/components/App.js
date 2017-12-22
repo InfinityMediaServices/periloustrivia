@@ -15,7 +15,7 @@ class App extends React.Component {
 		super();
 		this.base                  = base;
 		this.getHelperString       = this.getHelperString.bind(this);
-		this.getTimeoutDuration    = this.getTimeoutDuration.bind(this);
+		this.getTickCount          = this.getTickCount.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
@@ -29,8 +29,9 @@ class App extends React.Component {
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
+		this.tick                  = this.tick.bind(this);
+		this.tock                  = this.tock.bind(this);
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
-		this.cancelTimer           = this.cancelTimer.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
@@ -39,10 +40,12 @@ class App extends React.Component {
 		this.gameOn                = this.gameOn.bind(this);
 		this.getMe                 = this.getMe.bind(this);
 		this.setMe                 = this.setMe.bind(this);
+		this.isMe                  = this.isMe.bind(this);
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || { game: {} }
+		this.state                 = this.state || { game: {} };
+		this.timerDepot            = [];
 	}
 	componentWillMount() {
 		// this runs right before the <App> is rendered
@@ -94,6 +97,7 @@ class App extends React.Component {
 			}
 		});
 		console.log('this.setState: ', this.setState);
+		this.tock();
 	}
 
 	// in case the game is created before the auth callback
@@ -150,17 +154,17 @@ class App extends React.Component {
 		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
-	getTimeoutDuration(phase){
+	getTickCount(phase){
 		const game = {...this.state.game};
 		phase = phase || game.phase.name;
 		return {
 			playerSelect    : 0,
 			clueSelection   : 0,
-			cluePresentation: 3000,
-			buzzIn          : 5000,
-			questionSelect  : 7000,
-			results         : 3000,
-			scoreAdjustment : 3000,
+			cluePresentation: 3,
+			buzzIn          : 5,
+			questionSelect  : 7,
+			results         : 3,
+			scoreAdjustment : 3,
 			init            : 0
 		}[phase];
 	}
@@ -217,15 +221,14 @@ class App extends React.Component {
 			},
 			buzzIn : function(){
 				console.log('buzzIn did begin');
-				that.timerToNewPhase('results', that.getTimeoutDuration('buzzIn'));
+				that.timerToNewPhase('results', that.getTickCount('buzzIn'));
 			},
 			questionSelect : function(){
 				console.log('questionSelect did begin');
-				that.timerToNewPhase('results', that.getTimeoutDuration('questionSelect'));
+				that.timerToNewPhase('results', that.getTickCount('questionSelect'));
 			},
 			results : function(){
 				console.log('results did begin');
-				that.cancelTimer();
 				that.calculateResults();
 				//
 			},
@@ -242,8 +245,18 @@ class App extends React.Component {
 
 	getActiveClue() {
 		const game = this.state.game;
-		return game.cats[game.currentClue.cat].clues[game.currentClue.clue];
-
+		if (
+			game.cats
+			&& game.currentClue
+			&& game.currentClue.cat
+			&& game.currentClue.clue
+			&& game.cats[game.currentClue.cat]
+			&& game.cats[game.currentClue.cat].clues
+			&& game.cats[game.currentClue.cat].clues[game.currentClue.clue]
+		) {
+			return game.cats[game.currentClue.cat].clues[game.currentClue.clue];
+		}
+		return false;
 	}
 
 	setActiveClue(clue) {
@@ -312,7 +325,7 @@ class App extends React.Component {
 
 		}
 		this.setActiveClue(clue);
-		this.timerToNewPhase(newPhase, this.getTimeoutDuration('results'));
+		this.timerToNewPhase(newPhase, this.getTickCount('results'));
 
 
 
@@ -353,6 +366,12 @@ class App extends React.Component {
 		return game.players[user.uid];
 	}
 
+	isMe(uid = false){
+		const me = this.getMe();
+
+		return uid === me.uid;
+	}
+
 	selectClue(cat, clue) {
 		this.setState({
 			game: {
@@ -363,7 +382,7 @@ class App extends React.Component {
 			}
 		});
 		this.setPhase('cluePresentation');
-		this.timerToNewPhase('buzzIn', this.getTimeoutDuration('cluePresentation'));
+		this.timerToNewPhase('buzzIn', this.getTickCount('cluePresentation'));
 		// set timer
 	}
 
@@ -408,48 +427,93 @@ class App extends React.Component {
 		// console.log('newGame: ', newGame);
 	}
 
-	timerToNewPhase(phase, duration = false, tick = 1000) {
-		duration = duration === false ? this.getTimeoutDuration(phase) : duration;
-		let timer = {...this.state.game.timer};
-		if(timer.i === undefined){
-			timer = {
-				i: 0, // interval
-				d: 0, // duration
-				e: 0, // elapsed
-			};
-		}
-		clearInterval(timer.i);
-		timer.i = setInterval(() => {
-			const timer = {...this.state.game.timer};
-			let done = false;
-			timer.e += tick;
-			if (timer.e >= timer.d) {
-				timer.e = timer.d;
-				clearInterval(timer.i);
-				done = true;
+	tick(){
+		console.log('tick');
+		const game = {...this.state.game};
+		const { phase } = game;
+		const timerDepot = this.timerDepot;
+		console.log('timerDepot: ', timerDepot);
+
+		timerDepot.forEach((timer, index) => {
+			console.log(`Running tick on timer index: ${index}`);
+			const { phaseLock, callback } = timer;
+
+			// if you are here you own this timer.
+			// check phaseLock
+			if (phaseLock && phaseLock !== phase.name) {
+				// this timer is out of phase and should be removed
+				timerDepot[index] = null;
+				return;
 			}
-			this.setState({ game: { timer: timer } });
-			if (done) {
-				this.setPhase(phase);
+			// if you are here you are looking at a timer you own that is in phase.
+			// let's reduce the ticks by one and possibly run the callback
+			timer.ticks -= 1;
+			if (timer.ticks <= 0) {
+				// run the callback and remove the timer
+				callback.call();
+				timerDepot[index] = null;
+				return;
 			}
-		}, tick);
-		timer.d = duration;
-		timer.e = 0;
-		this.setState({ game: { timer: timer } });
+			timerDepot[index] = timer;
+		});
+
+		this.timerDepot = timerDepot.filter(timer => timer !== null);
+
 	}
 
-	cancelTimer(){
-		let i = this.state.game.timer.i;
-		clearInterval(i);
-		this.setState({ game: { timer: {
-			i: i, // interval
-			d: 0, // duration
-			e: 0, // elapsed
-		} } });
+	tock() {
+		// Clear any previous interval timer for this player
+		// and create a new interval that runs the tick each second
+		const that = this;
+		console.log('tock running');
+		const game = {...this.state.game};
+		console.log('game: ', game);
+		const players = {};
+		const me = this.getMe();
+		let tick  = Number(me.tick);
+
+		// if there is an interval let's clear it
+		if (tick) {
+			clearInterval(tick);
+		}
+		// add a new interval
+		tick = setInterval(that.tick, 1000);
+
+		players[me.uid] = {
+			tick
+		};
+
+		this.setState({
+			game: {
+				players
+			}
+		}, () => {
+
+		});
+	}
+
+	timerToNewPhase(phase, duration = false, phaseLock = true) {
+		// introduce a new timer in the timer depot that will have a callback to setPhase
+		if (phase === undefined) return;
+		const game = {...this.state.game};
+		const me = this.getMe();
+		const that = this;
+		const timerDepot = this.timerDepot;
+		duration = duration !== false ? duration : this.getTickCount();
+		phaseLock = phaseLock === true ? game.phase.name : phaseLock;
+		const timer = {
+			owner: me.uid,
+			ticks: duration,
+			callback: function(){
+				that.setPhase(phase)
+			},
+			phaseLock
+		}
+
+		timerDepot.push(timer);
 	}
 
 	buzzIn() {
-		this.cancelTimer();
 		const game = {...this.state.game};
 		const me = this.getMe();
 		let newGame = {};
