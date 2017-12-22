@@ -6,12 +6,11 @@ class Buzzer extends React.Component {
 		const me            = this.props.me;
 		const isPhase       = this.props.isPhase;
 		const buzzIn        = this.props.buzzIn;
-		const getActiveClue = this.props.getActiveClue;
+		const clue          = this.props.getActiveClue();
 
-  	if(!game || !game.phase) {
+  	if(!game || !game.phase || !clue) {
   		return null;
   	}
-		const clue          = this.props.getActiveClue();
   	clue.losers = clue.losers || [{uid: false}];
 		const isDisabled  = !isPhase('buzzIn') || clue.losers.some(loser => loser.uid === me.uid);
     return (
