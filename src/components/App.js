@@ -436,7 +436,7 @@ class App extends React.Component {
 
 		timerDepot.forEach((timer, index) => {
 			console.log(`Running tick on timer index: ${index}`);
-			const { phaseLock, callback } = timer;
+			const { phaseLock, onComplete } = timer;
 
 			// if you are here you own this timer.
 			// check phaseLock
@@ -446,11 +446,13 @@ class App extends React.Component {
 				return;
 			}
 			// if you are here you are looking at a timer you own that is in phase.
-			// let's reduce the ticks by one and possibly run the callback
+			// let's reduce the ticks by one and possibly run the `onComplete` callback
 			timer.ticks -= 1;
 			if (timer.ticks <= 0) {
-				// run the callback and remove the timer
-				callback.call();
+				// run the `onComplete` callback and remove the timer
+				if (onComplete instanceof Function) {
+					onComplete.call();
+				}
 				timerDepot[index] = null;
 				return;
 			}
@@ -493,7 +495,7 @@ class App extends React.Component {
 	}
 
 	timerToNewPhase(phase, duration = false, phaseLock = true) {
-		// introduce a new timer in the timer depot that will have a callback to setPhase
+		// introduce a new timer in the timer depot that will have a onComplete to setPhase
 		if (phase === undefined) return;
 		const game = {...this.state.game};
 		const me = this.getMe();
@@ -504,7 +506,7 @@ class App extends React.Component {
 		const timer = {
 			owner: me.uid,
 			ticks: duration,
-			callback: function(){
+			onComplete: function(){
 				that.setPhase(phase)
 			},
 			phaseLock
