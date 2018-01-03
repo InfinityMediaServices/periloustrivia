@@ -11,7 +11,7 @@ class StatusBar extends React.Component {
 		if(phase.isClueSelection){
 			msg = me.uid === game.activePlayer ?
 				'You have control of the board.  Please select a clue.' :
-				game.players[me.uid].displayName + ' has contol of the board';
+				game.players[me.uid].displayName + ' has control of the board';
 		} else if (phase.isQuestionSelect) {
 			msg = me.uid === game.activePlayer ?
 				'Please Pick a question.' :
@@ -22,6 +22,7 @@ class StatusBar extends React.Component {
 			<div className="status-bar">
 				<h2>Status Bar</h2>
 				<div className="message">{msg}</div>
+				<pre>Game Phase: {phase.name}</pre>
 			</div>
 		)
 	}
