@@ -38,10 +38,11 @@ class ScoreBoard extends React.Component {
 		return (<ul>
 			{Object.keys(game.players).map(key => {
 				const score = game.players[key].score || 0;
+				const classList = [];
+				let subText = null;
 				if (!game.players[key]) {
 					return null
 				}
-				let subText = null;
 				// console.log('game.players[key]: ', game.players[key]);
 				if(game.round > 0) {
 					subText = (score < 0 ? '-' : '') + "$" + Math.abs(score);
@@ -54,8 +55,10 @@ class ScoreBoard extends React.Component {
 					subText = "Waiting to confirm readiness to play";
 				}
 				// console.log('me.isReady: ', me.isReady);
+				classList.push(key === me.uid ? 'player-me' : 'player-other');
+				classList.push(game.activePlayer === me.uid ? 'player-active' : 'player-inactive');
 				return (
-					<li key={key} className={key === me.uid ? 'player-me' : 'player-other'}>
+					<li key={key} className={classList.join(' ')}>
 						{/*game.players[key].displayName*/}
 						{game.players[key].email}
 						{key === me.uid ? <span className="is-self"> (you) </span> : null}
