@@ -608,12 +608,10 @@ class App extends React.Component {
 
 	startRound() {}
 
-	startGame(me) {
+	startGame() {
 		const game = {...this.state.game};
 		const players = Object.keys(game.players);
-		// // console.log('me in startGame: ', me);
 
-		// set me to ready and set score to 0
 		this.setMe('isReady',  true);
 		this.setMe('score',  0);
 		// check that all users are ready
@@ -770,7 +768,6 @@ class App extends React.Component {
 				<GameBoard
 					game={this.state.game}
 					me={me}
-					startGame={this.startGame}
 					selectClue={this.selectClue}
 					gameOn={this.gameOn}
 					isPhase={this.isPhase}

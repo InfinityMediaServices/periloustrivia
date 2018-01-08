@@ -69,7 +69,7 @@ class ScoreBoard extends React.Component {
 						{key === me.uid ? <span className="is-self"> (you) </span> : null}
 						<span> </span>
 						<strong>{ subText }</strong>
-						{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame(me);  }}> Press Here to begin </button> </span> : ''}
+						{key === me.uid && !me.isReady ? <span> If you are ready to begin the game <button onClick={()=>{ this.props.startGame();  }}> Press Here to begin </button> </span> : ''}
 					</li>
 				)
 			})}
