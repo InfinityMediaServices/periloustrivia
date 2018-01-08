@@ -15,7 +15,7 @@ class App extends React.Component {
 		super();
 		this.base                  = base;
 		this.getHelperString       = this.getHelperString.bind(this);
-		this.getTimeoutDuration    = this.getTimeoutDuration.bind(this);
+		this.getTickCount          = this.getTickCount.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
@@ -26,11 +26,14 @@ class App extends React.Component {
 		this.selectClue            = this.selectClue.bind(this);
 		this.selectQuestion        = this.selectQuestion.bind(this);
 		this.joinGame              = this.joinGame.bind(this);
+		this.startRound            = this.startRound.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.isRoundOver           = this.isRoundOver.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
+		this.tick                  = this.tick.bind(this);
+		this.tock                  = this.tock.bind(this);
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
-		this.cancelTimers           = this.cancelTimers.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
@@ -39,10 +42,12 @@ class App extends React.Component {
 		this.gameOn                = this.gameOn.bind(this);
 		this.getMe                 = this.getMe.bind(this);
 		this.setMe                 = this.setMe.bind(this);
+		this.isMe                  = this.isMe.bind(this);
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || { game: {} }
+		this.state                 = this.state || { game: {} };
+		this.timerDepot            = [];
 	}
 	componentWillMount() {
 		// this runs right before the <App> is rendered
@@ -94,6 +99,7 @@ class App extends React.Component {
 			}
 		});
 		console.log('this.setState: ', this.setState);
+		this.tock();
 	}
 
 	// in case the game is created before the auth callback
@@ -150,17 +156,17 @@ class App extends React.Component {
 		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
-	getTimeoutDuration(phase){
+	getTickCount(phase){
 		const game = {...this.state.game};
 		phase = phase || game.phase.name;
 		return {
 			playerSelect    : 0,
 			clueSelection   : 0,
-			cluePresentation: 3000,
-			buzzIn          : 5000,
-			questionSelect  : 7000,
-			results         : 3000,
-			scoreAdjustment : 3000,
+			cluePresentation: 3,
+			buzzIn          : 5,
+			questionSelect  : 7,
+			results         : 3,
+			scoreAdjustment : 3,
 			init            : 0
 		}[phase];
 	}
@@ -217,15 +223,14 @@ class App extends React.Component {
 			},
 			buzzIn : function(){
 				console.log('buzzIn did begin');
-				that.timerToNewPhase('results', that.getTimeoutDuration('buzzIn'));
+				that.timerToNewPhase('results', that.getTickCount('buzzIn'));
 			},
 			questionSelect : function(){
 				console.log('questionSelect did begin');
-				that.timerToNewPhase('results', that.getTimeoutDuration('questionSelect'));
+				that.timerToNewPhase('results', that.getTickCount('questionSelect'));
 			},
 			results : function(){
 				console.log('results did begin');
-				that.cancelTimers();
 				that.calculateResults();
 				//
 			},
@@ -242,8 +247,18 @@ class App extends React.Component {
 
 	getActiveClue() {
 		const game = this.state.game;
-		return game.cats[game.currentClue.cat].clues[game.currentClue.clue];
-
+		if (
+			game.cats
+			&& game.currentClue
+			&& game.currentClue.cat
+			&& game.currentClue.clue
+			&& game.cats[game.currentClue.cat]
+			&& game.cats[game.currentClue.cat].clues
+			&& game.cats[game.currentClue.cat].clues[game.currentClue.clue]
+		) {
+			return game.cats[game.currentClue.cat].clues[game.currentClue.clue];
+		}
+		return false;
 	}
 
 	setActiveClue(clue) {
@@ -312,7 +327,7 @@ class App extends React.Component {
 
 		}
 		this.setActiveClue(clue);
-		this.timerToNewPhase(newPhase, this.getTimeoutDuration('results'));
+		this.timerToNewPhase(newPhase, this.getTickCount('results'));
 
 
 
@@ -353,6 +368,12 @@ class App extends React.Component {
 		return game.players[user.uid];
 	}
 
+	isMe(uid = false){
+		const me = this.getMe();
+
+		return uid === me.uid;
+	}
+
 	selectClue(cat, clue) {
 		this.setState({
 			game: {
@@ -363,7 +384,7 @@ class App extends React.Component {
 			}
 		});
 		this.setPhase('cluePresentation');
-		this.timerToNewPhase('buzzIn', this.getTimeoutDuration('cluePresentation'));
+		this.timerToNewPhase('buzzIn', this.getTickCount('cluePresentation'));
 		// set timer
 	}
 
@@ -408,58 +429,117 @@ class App extends React.Component {
 		// console.log('newGame: ', newGame);
 	}
 
-	timerToNewPhase(phase, duration = false, tick = 1000) {
-		duration = duration === false ? this.getTimeoutDuration(phase) : duration;
-		let timer = {...this.state.game.timer};
-		if(timer.i === undefined){
-			timer = {
-				i: 0, // interval
-				d: 0, // duration
-				e: 0, // elapsed
-			};
-		}
-		this.cancelTimers();
-		timer.i = setInterval(() => {
-			const timer = {...this.state.game.timer};
-			let done = false;
-			timer.e += tick;
-			if (timer.e >= timer.d) {
-				timer.e = timer.d;
-				this.cancelTimers();
-				done = true;
+	tick(){
+		console.log('tick');
+		const game = {...this.state.game};
+		const { phase } = game;
+		const timerDepot = this.timerDepot;
+		console.log('timerDepot: ', timerDepot);
+
+		timerDepot.forEach((timer, index) => {
+			console.log(`Running tick on timer index: ${index}`);
+			const { phaseLock, onComplete, onTick } = timer;
+
+			// if you are here you own this timer.
+			// check phaseLock
+			if (phaseLock && phaseLock !== phase.name) {
+				// this timer is out of phase and should be removed
+				timerDepot[index] = null;
+				return;
 			}
-			this.setState({ game: { timer: timer } });
-			if (done) {
-				this.setPhase(phase);
+			// if you are here you are looking at a timer you own that is in phase.
+			// let's do this list of things
+			// * reduce the ticks by one
+			// * run the `onTick` callback
+			// * possibly run the `onComplete` callback if we are out of ticks
+			timer.ticks -= 1;
+			if (onTick instanceof Function) {
+				onTick.call(this, {
+					ticks: timer.ticks,
+					totalTicks: timer.totalTicks,
+				});
 			}
-		}, tick);
-		timer.d = duration;
-		timer.e = 0;
-		this.setState({ game: { timer: timer } });
+			if (timer.ticks <= 0) {
+				// run the `onComplete` callback and remove the timer
+				if (onComplete instanceof Function) {
+					onComplete.call();
+				}
+				timerDepot[index] = null;
+				return;
+			}
+			timerDepot[index] = timer;
+		});
+
+		this.timerDepot = timerDepot.filter(timer => timer !== null);
+
 	}
 
-	cancelTimers(){
-		let i = this.state.game.timer.i;
+	tock() {
+		// Clear any previous interval timer for this player
+		// and create a new interval that runs the tick each second
+		const that = this;
+		console.log('tock running');
+		const game = {...this.state.game};
+		console.log('game: ', game);
+		const players = {};
+		const me = this.getMe();
+		let tick  = Number(me.tick);
 
-
-		let tempID = setTimeout(function() {}, 0);
-		while (tempID--) {
-		    clearTimeout(tempID); // will do nothing if no timeout with tempID is present
+		// if there is an interval let's clear it
+		if (tick) {
+			clearInterval(tick);
 		}
-		tempID = setInterval(function() {}, 0);
-		while (tempID--) {
-		    clearInterval(tempID); // will do nothing if no interval with tempID is present
+		// add a new interval
+		tick = setInterval(that.tick, 1000);
+
+		players[me.uid] = {
+			tick
+		};
+
+		this.setState({
+			game: {
+				players
+			}
+		}, () => {
+
+		});
+	}
+
+	timerToNewPhase(phase, duration = false, phaseLock = true) {
+		// introduce a new timer in the timer depot that will have a onComplete to setPhase
+		if (phase === undefined) return;
+		const game = {...this.state.game};
+		const me = this.getMe();
+		const that = this;
+		const timerDepot = this.timerDepot;
+		duration = duration !== false ? duration : this.getTickCount();
+		phaseLock = phaseLock === true ? game.phase.name : phaseLock;
+		const timer = {
+			owner: me.uid,
+			totalTicks: duration,
+			ticks: duration,
+			onTick: function(settings){
+				const { ticks, totalTicks } = settings;
+				// alter the timer vars.
+				that.setState({
+					game: {
+						timer : {
+							totalTicks,
+							ticks
+						}
+					}
+				})
+			},
+			onComplete: function(){
+				that.setPhase(phase)
+			},
+			phaseLock
 		}
 
-		this.setState({ game: { timer: {
-			i: i, // interval
-			d: 0, // duration
-			e: 0, // elapsed
-		} } });
+		timerDepot.push(timer);
 	}
 
 	buzzIn() {
-		this.cancelTimers();
 		const game = {...this.state.game};
 		const me = this.getMe();
 		let newGame = {};
@@ -526,12 +606,12 @@ class App extends React.Component {
 		});
 	}
 
-	startGame(me) {
+	startRound() {}
+
+	startGame() {
 		const game = {...this.state.game};
 		const players = Object.keys(game.players);
-		// // console.log('me in startGame: ', me);
 
-		// set me to ready and set score to 0
 		this.setMe('isReady',  true);
 		this.setMe('score',  0);
 		// check that all users are ready
@@ -578,13 +658,33 @@ class App extends React.Component {
 		this.setState({ game: newGame });
 	}
 
+	isRoundOver() {
+		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
+		const game = {...this.state.game};
+		const { cats } = game;
+
+		if (!cats){
+			return false;
+		}
+
+		return Object.keys(cats).some(cat => {
+			const { clues } = cat;
+
+			// if clue.dead === true return false so .some keeps looking
+			return Object.keys(clues).some(clue => clue.dead !== true)
+		})
+
+	}
 	updateScore(uid, delta) {
 		const game = {...this.state.game};
+		const players = {};
 		if(!game.players[uid]) {
 			return false
 		}
-		game.players[uid].score += delta;
-		this.setState({ game: { players: game.players }});
+		players[uid] = {
+			score : game.players[uid].score + delta
+		};
+		this.setState({ game: { players }});
 	}
 
 	loadSamples(game) {
@@ -671,7 +771,6 @@ class App extends React.Component {
 				<GameBoard
 					game={this.state.game}
 					me={me}
-					startGame={this.startGame}
 					selectClue={this.selectClue}
 					gameOn={this.gameOn}
 					isPhase={this.isPhase}

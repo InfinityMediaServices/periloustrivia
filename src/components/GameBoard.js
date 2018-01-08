@@ -58,7 +58,6 @@ class GameBoard extends React.Component {
 GameBoard.propTypes = {
 	game: React.PropTypes.object.isRequired,
 	me: React.PropTypes.object.isRequired,
-	startGame: React.PropTypes.func.isRequired,
 	selectClue: React.PropTypes.func.isRequired,
 	gameOn: React.PropTypes.func.isRequired,
 	isPhase: React.PropTypes.func.isRequired,
