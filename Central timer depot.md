@@ -8,7 +8,7 @@ state.game.timers = {
 			'buzzer',
 			'etc'
 		],
-    phaseLock: 'buzzIn',
+	phaseLock: 'buzzIn',
 		callback: function(){},
 		ticks: numberOfSecondsUntilExecution
 	},
@@ -22,11 +22,11 @@ state.game.timers = {
 ```
 timer.ticks--
 if(timer.ticks <=0){
-    callback.call();
+	callback.call();
 }
 ```
 
-on any they own. 
+on any they own.
 
 There is also a 'phaseLock' property.  If this is set that locks the timer into the phase named in the prop val.  if the current phase is not that phase the timer is deleted during the timer check interval if the owner has your player ID.
 
