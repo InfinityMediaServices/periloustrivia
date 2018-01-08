@@ -677,11 +677,14 @@ class App extends React.Component {
 	}
 	updateScore(uid, delta) {
 		const game = {...this.state.game};
+		const players = {};
 		if(!game.players[uid]) {
 			return false
 		}
-		game.players[uid].score += delta;
-		this.setState({ game: { players: game.players }});
+		players[uid] = {
+			score : game.players[uid].score + delta
+		};
+		this.setState({ game: { players }});
 	}
 
 	loadSamples(game) {
