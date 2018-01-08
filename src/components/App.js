@@ -28,6 +28,7 @@ class App extends React.Component {
 		this.joinGame              = this.joinGame.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.isRoundOver           = this.isRoundOver.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
 		this.tick                  = this.tick.bind(this);
 		this.tock                  = this.tock.bind(this);
@@ -656,6 +657,23 @@ class App extends React.Component {
 		this.setState({ game: newGame });
 	}
 
+	isRoundOver() {
+		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
+		const game = {...this.state.game};
+		const { cats } = game;
+
+		if (!cats){
+			return false;
+		}
+
+		return Object.keys(cats).some(cat => {
+			const { clues } = cat;
+
+			// if clue.dead === true return false so .some keeps looking
+			return Object.keys(clues).some(clue => clue.dead !== true)
+		})
+
+	}
 	updateScore(uid, delta) {
 		const game = {...this.state.game};
 		if(!game.players[uid]) {
