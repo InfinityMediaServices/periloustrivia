@@ -21,8 +21,8 @@ class StatusBar extends React.Component {
 			<div className="status-bar">
 				<h2>Status Bar</h2>
 				<div className="message">{msg}</div>
-				<pre>Active Player: {JSON.stringify(game.players[game.activePlayer], null, 2)}</pre>
 				<pre>Game Phase: {phase.name}</pre>
+				<pre>Active Player: {JSON.stringify(game.players[game.activePlayer], null, 2)}</pre>
 			</div>
 		)
 	}
