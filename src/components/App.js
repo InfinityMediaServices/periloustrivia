@@ -26,6 +26,7 @@ class App extends React.Component {
 		this.selectClue            = this.selectClue.bind(this);
 		this.selectQuestion        = this.selectQuestion.bind(this);
 		this.joinGame              = this.joinGame.bind(this);
+		this.startRound            = this.startRound.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.isRoundOver           = this.isRoundOver.bind(this);
@@ -604,6 +605,8 @@ class App extends React.Component {
 			}
 		});
 	}
+
+	startRound() {}
 
 	startGame(me) {
 		const game = {...this.state.game};
