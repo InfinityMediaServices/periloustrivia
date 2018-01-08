@@ -59,8 +59,13 @@ class ScoreBoard extends React.Component {
 				classList.push(game.activePlayer === me.uid ? 'player-active' : 'player-inactive');
 				return (
 					<li key={key} className={classList.join(' ')}>
-						{/*game.players[key].displayName*/}
+						<span className="displayName">
+						{game.players[key].displayName}
+						</span>
+						<span> </span>
+						<span className="email">
 						{game.players[key].email}
+						</span>
 						{key === me.uid ? <span className="is-self"> (you) </span> : null}
 						<span> </span>
 						<strong>{ subText }</strong>

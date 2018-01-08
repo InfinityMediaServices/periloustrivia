@@ -11,17 +11,17 @@ class StatusBar extends React.Component {
 		if(phase.isClueSelection){
 			msg = me.uid === game.activePlayer ?
 				'You have control of the board.  Please select a clue.' :
-				game.players[me.uid].displayName + ' has control of the board';
+				game.players[game.activePlayer].displayName + ' has control of the board';
 		} else if (phase.isQuestionSelect) {
 			msg = me.uid === game.activePlayer ?
 				'Please Pick a question.' :
-				game.players[me.uid].displayName + ' is attempting to answer';
-
+				game.players[game.activePlayer].displayName + ' is attempting to answer';
 		}
 		return (
 			<div className="status-bar">
 				<h2>Status Bar</h2>
 				<div className="message">{msg}</div>
+				<pre>Active Player: {JSON.stringify(game.players[game.activePlayer], null, 2)}</pre>
 				<pre>Game Phase: {phase.name}</pre>
 			</div>
 		)
