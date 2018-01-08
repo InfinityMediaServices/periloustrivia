@@ -1,6 +1,3 @@
-# My project's README
+# Perilous Trivia
 
-
-look into this:
-
-<http://stackoverflow.com/questions/32108880/firebase-rule-that-needs-to-check-for-value-in-array-contains-in-security-rul>
+A cool React app that uses firebase to make a multi-player trivia game that might remind you of a TV show.
