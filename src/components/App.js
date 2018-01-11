@@ -12,43 +12,50 @@ import Timer from './Timer';
 
 class App extends React.Component {
 	constructor() {
+		// Essentials
 		super();
 		this.base                  = base;
-		this.getHelperString       = this.getHelperString.bind(this);
-		this.getTickCount          = this.getTickCount.bind(this);
+		this.state                 = this.state || { game: {} };
+		// Authentication
+		this.authenticate          = this.authenticate.bind(this);
+		this.authHandler           = this.authHandler.bind(this);
+		this.logout                = this.logout.bind(this);
+		// Phases
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
 		this.getPhaseNames         = this.getPhaseNames.bind(this);
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
-		this.calculateResults      = this.calculateResults.bind(this);
+		// Helpers & Utilities
+		this.getHelperString       = this.getHelperString.bind(this);
+		this.getTickCount          = this.getTickCount.bind(this);
+		this.hasInit               = this.hasInit.bind(this);
 		this.getActiveClue         = this.getActiveClue.bind(this);
 		this.setActiveClue         = this.setActiveClue.bind(this);
-		this.hasInit               = this.hasInit.bind(this);
+		this.getMe                 = this.getMe.bind(this);
+		this.setMe                 = this.setMe.bind(this);
+		this.isMe                  = this.isMe.bind(this);
+		this.calculateResults      = this.calculateResults.bind(this);
 		this.selectClue            = this.selectClue.bind(this);
 		this.selectQuestion        = this.selectQuestion.bind(this);
 		this.joinGame              = this.joinGame.bind(this);
 		this.startRound            = this.startRound.bind(this);
 		this.startGame             = this.startGame.bind(this);
-		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.isRoundOver           = this.isRoundOver.bind(this);
+		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
-		this.tick                  = this.tick.bind(this);
-		this.tock                  = this.tock.bind(this);
-		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
-		this.buzzIn                = this.buzzIn.bind(this);
-		this.loadSamples           = this.loadSamples.bind(this);
 		this.loadPhases            = this.loadPhases.bind(this);
-		this.authenticate          = this.authenticate.bind(this);
-		this.logout                = this.logout.bind(this);
-		this.authHandler           = this.authHandler.bind(this);
+		this.loadSamples           = this.loadSamples.bind(this);
+		// User Actions
+		this.buzzIn                = this.buzzIn.bind(this);
 		this.gameOn                = this.gameOn.bind(this);
-		this.getMe                 = this.getMe.bind(this);
-		this.setMe                 = this.setMe.bind(this);
-		this.isMe                  = this.isMe.bind(this);
+		// Intros and Outros
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || { game: {} };
+		// Timing
+		this.tick                  = this.tick.bind(this);
+		this.tock                  = this.tock.bind(this);
+		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
 		this.timerDepot            = [];
 	}
 	componentWillMount() {
