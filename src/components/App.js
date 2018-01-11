@@ -606,40 +606,23 @@ class App extends React.Component {
 	startRound() {}
 
 	startGame() {
-		const game = {...this.state.game};
-		const players = Object.keys(game.players);
+		const game = {...this.state.game},
+			newGame = {},
+			players = Object.keys(game.players);
 
 		this.setMe('isReady',  true);
 		this.setMe('score',  0);
-		// check that all users are ready
-		let allGood = players.reduce((allGood, player) => {
-			if (allGood === false) {
-				return false;
-			}
-			if(!game.players[player].isReady){
-				return false;
-			}
-			return allGood;
-		}, true);
-		// are there enough players?
-		if (players.length < 2) {
-			allGood = false;
-		}
+		// check that all users are ready and there are between 2 and 4 players
+		let allGood = players.every(player => game.players[player].isReady === true) && players.length >= 2 && players.length <= 4;
 
 		console.log('allGood: ', allGood);
 		if (allGood) {
 			console.log(`all good setActivePlayer to ${game.owner}`);
-			game.round = 1;
-			game.activePlayer = game.owner;
-			game.phase.name = 'clueSelection';
-			game.phase.isClueSelection = true;
-			this.setState({game}, function(){
-				// has to be set AFTER previous so as to not to collide state objects
-				console.log('state set', this.state);
-			});
-				// this.setPhase('clueSelection');
-		} else {
-			// // console.log('waiting on someone');
+			newGame.round = 1;
+			newGame.activePlayer = game.owner;
+			newGame.phase = { name: 'clueSelection' };
+			newGame.phase.isClueSelection = true;
+			this.setState({ game: newGame });
 		}
 	}
 
