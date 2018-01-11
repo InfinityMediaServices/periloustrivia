@@ -188,7 +188,7 @@ class App extends React.Component {
 		if (callback instanceof Function) {
 			callback.call();
 		}
-		this.phaseDidBegin();
+		this.phaseDidBegin(phase);
 	}
 
 	isPhase(phase) {
@@ -208,8 +208,8 @@ class App extends React.Component {
 		return isIt;
 	}
 
-	phaseDidBegin(){
-		// const game = {...this.state.game};
+	phaseDidBegin(phaseName){
+		phaseName = phaseName === undefined ? this.state.game.phase.name : phaseName;
 		const that = this;
 		const callbacks = {
 			playerSelect : function(){
