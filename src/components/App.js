@@ -241,7 +241,9 @@ class App extends React.Component {
 				console.log('init did begin');
 			}
 		}
-		callbacks[this.state.game.phase.name].call();
+		if (callbacks[phaseName]) {
+			callbacks[phaseName].call();
+		}
 
 	}
 
