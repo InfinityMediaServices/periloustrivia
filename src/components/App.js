@@ -18,6 +18,7 @@ class App extends React.Component {
 		this.getTickCount          = this.getTickCount.bind(this);
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
+		this.getPhaseNames         = this.getPhaseNames.bind(this);
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
 		this.calculateResults      = this.calculateResults.bind(this);
 		this.getActiveClue         = this.getActiveClue.bind(this);
@@ -36,6 +37,7 @@ class App extends React.Component {
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.loadSamples           = this.loadSamples.bind(this);
+		this.loadPhases            = this.loadPhases.bind(this);
 		this.authenticate          = this.authenticate.bind(this);
 		this.logout                = this.logout.bind(this);
 		this.authHandler           = this.authHandler.bind(this);
@@ -85,6 +87,7 @@ class App extends React.Component {
 						if (!data) {
 							if (!this.hasInit(this.state.game)) {
 								let game = this.loadSamples(emptyGame);
+								game = this.loadPhases(game);
 								this.setState({ game: game });
 							}
 						}
@@ -206,6 +209,26 @@ class App extends React.Component {
 		}
 		// // console.log('checking isPhase: ', phase);
 		return isIt;
+	}
+
+	getPhaseNames() {
+		return [
+			// PRE GAME
+			'playerSelect',
+			// GAME ON
+			// 'gameIntro',
+			// 'roundIntro',
+			// 'categoryPresentation',
+			'clueSelection',
+			'cluePresentation',
+			'buzzIn',
+			// 'questionSelectIntro',
+			'questionSelect',
+			'results',
+			'scoreAdjustment',
+			// system phase
+			'init'
+		];
 	}
 
 	phaseDidBegin(phaseName){
@@ -703,6 +726,25 @@ class App extends React.Component {
 		game.owner = this.state.uid;
 
 		// // console.log('game at fn end: ', game);
+		return game;
+	}
+
+	loadPhases(game) {
+		// Get all the names of the phases
+		const possibleNames = this.getPhaseNames();
+		// set them in a prop
+		game.phase = {
+			possibleNames,
+		};
+		// in each case, set the helper prop to false
+		possibleNames.map(phaseName => {
+			game.phase[this.getHelperString(phaseName)] = false;
+		});
+		// set init phase info
+		game.phase.isInit = true;
+		game.phase.name =  'init';
+		game.phase.hasInit =  false;
+
 		return game;
 	}
 

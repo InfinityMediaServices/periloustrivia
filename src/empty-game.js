@@ -1,42 +1,7 @@
 // This is just some empty data so you don't have to think of your own!
 const emptyGame = {
 	cats: [],
-	phase: {
-		possibleNames:[
-			// PRE GAME
-			'playerSelect',
-			// GAME ON
-			// 'gameIntro',
-			// 'roundIntro',
-			// 'categoryPresentation',
-			'clueSelection',
-			'cluePresentation',
-			'buzzIn',
-			// 'questionSelectIntro',
-			'questionSelect',
-			'results',
-			'scoreAdjustment',
-			// system phase
-			'init'
-		],
-		// State Helper booleans
-		isPlayerSelect: false,
-		// isGameIntro: false,
-		// isRoundIntro: false,
-		// isCategoryPresentation: false,
-		isClueSelection: false,
-		isCluePresentation: false,
-		isBuzzIn: false,
-		// isQuestionSelectIntro: false,
-		isQuestionSelect: false,
-		isResults: false,
-		isScoreAdjustment: false,
-
-		isInit: true,
-		name: 'init',
-		hasInit: false
-
-	},
+	phase: {},
 	round: 0,
 	rounds: [
 		{
