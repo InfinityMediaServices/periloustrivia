@@ -430,11 +430,9 @@ class App extends React.Component {
 	}
 
 	tick(){
-		console.log('tick');
 		const game = {...this.state.game};
 		const { phase } = game;
 		const timerDepot = this.timerDepot;
-		console.log('timerDepot: ', timerDepot);
 
 		timerDepot.forEach((timer, index) => {
 			console.log(`Running tick on timer index: ${index}`);
@@ -478,7 +476,6 @@ class App extends React.Component {
 		// Clear any previous interval timer for this player
 		// and create a new interval that runs the tick each second
 		const that = this;
-		console.log('tock running');
 		const game = {...this.state.game};
 		console.log('game: ', game);
 		const players = {};
@@ -638,7 +635,7 @@ class App extends React.Component {
 			game.phase.isClueSelection = true;
 			this.setState({game}, function(){
 				// has to be set AFTER previous so as to not to collide state objects
-				console.log('state set');
+				console.log('state set', this.state);
 			});
 				// this.setPhase('clueSelection');
 		} else {
