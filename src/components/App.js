@@ -697,21 +697,17 @@ class App extends React.Component {
 	}
 
 	isRoundOver() {
-		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
+		// Check each clue in `game.cats` and return true if all are dead, false otherwise
 		const game = {...this.state.game};
 		const { cats } = game;
 
 		if (!cats){
 			return false;
 		}
-
-		return Object.keys(cats).some(cat => {
+		return cats.every(cat => {
 			const { clues } = cat;
-
-			// if clue.dead === true return false so .some keeps looking
-			return Object.keys(clues).some(clue => clue.dead !== true)
-		})
-
+			return clues.every(clue => clue.dead === true);
+		});
 	}
 
 	startGame() {
