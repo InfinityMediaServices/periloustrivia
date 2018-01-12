@@ -277,6 +277,10 @@ class App extends React.Component {
 				that.calculateResults();
 				//
 			},
+			roundIntro : function() {
+				console.log('roundIntro did begin');
+				that.doRoundIntro();
+			},
 			scoreAdjustment : function() {
 				console.log('scoreAdjustment did begin');
 			},
