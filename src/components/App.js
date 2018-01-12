@@ -49,6 +49,7 @@ class App extends React.Component {
 		this.joinGame              = this.joinGame.bind(this);
 		this.startGame             = this.startGame.bind(this);
 		this.startRound            = this.startRound.bind(this);
+		this.endRound              = this.endRound.bind(this);
 		this.isRoundOver           = this.isRoundOver.bind(this);
 		// Intros and Outros
 		this.doGameIntro           = this.doGameIntro.bind(this);
@@ -642,6 +643,69 @@ class App extends React.Component {
 	}
 
 	startRound() {}
+
+	endRound(leaveOneClueAlive = true) {
+		// helper function for testing
+		console.log('in function "endRound"');
+		// simply set all the questions to dead except one
+		const game = {...this.state.game},
+			newGame = { cats: game.cats },
+			{ cats } = game;
+		let haveSkippedOne = leaveOneClueAlive === true ? false : true;
+		console.log({
+			game,
+			newGame,
+			cats,
+		});
+		if (!cats){
+			return false;
+		}
+		cats.forEach((cat, catIndex) => {
+			const { clues } = cat;
+			clues.forEach((clue, clueIndex) => {
+				console.log(`evaluating cat: ${catIndex} clue: ${clueIndex}`);
+
+				if (clue.dead === true) {
+					console.log('clue dead, moving on.');
+					return
+				}
+				if (!haveSkippedOne) {
+					haveSkippedOne = true;
+					console.log('skipping first live clue.');
+					return;
+				}
+				console.log('killing clue.');
+				newGame.cats[catIndex].clues[clueIndex].dead = true;
+			});
+		});
+		console.log('about to setState');
+		console.log({
+			newGame
+		});
+
+
+		this.setState({
+			game: newGame
+		});
+	}
+
+	isRoundOver() {
+		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
+		const game = {...this.state.game};
+		const { cats } = game;
+
+		if (!cats){
+			return false;
+		}
+
+		return Object.keys(cats).some(cat => {
+			const { clues } = cat;
+
+			// if clue.dead === true return false so .some keeps looking
+			return Object.keys(clues).some(clue => clue.dead !== true)
+		})
+
+	}
 
 	startGame() {
 		const game = {...this.state.game},
