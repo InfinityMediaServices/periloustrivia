@@ -254,8 +254,7 @@ class App extends React.Component {
 			},
 			clueSelection : function(){
 				console.log('clueSelection did begin');
-				const isRoundOver = that.isRoundOver();
-				if (isRoundOver) {
+				if (that.isRoundOver()) {
 					that.doRoundOutro();
 				}
 			},
