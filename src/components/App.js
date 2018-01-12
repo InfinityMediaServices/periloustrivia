@@ -53,6 +53,8 @@ class App extends React.Component {
 		// Intros and Outros
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
+		this.doGameOutro           = this.doGameOutro.bind(this);
+		this.doRoundOutro          = this.doRoundOutro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
 		// Timing
 		this.tick                  = this.tick.bind(this);
@@ -766,6 +768,38 @@ class App extends React.Component {
 
 	doRoundIntro(){
 		this.setPhase('clueSelection');
+	}
+
+	doGameOutro(){
+		// this.setPhase('roundOutro');
+	}
+
+	doRoundOutro(){
+		/*
+		 * - get current round number
+		 *     - if it is less than 3 increase it by one
+		 *     - else timer to game outro
+		 * - move `game.rounds[round].cats` into game.cats
+		 * - setState
+		 * - timer to roundIntro
+
+		*/
+		const game = {...this.state.game},
+			newGame = {};
+		let { round } = game;
+
+		if (round >= 3) {
+			this.doGameOutro();
+			return;
+		}
+
+		round += 1;
+		newGame.round = round;
+		newGame.cats = game.rounds[round].cats
+		this.setState({
+			game: newGame
+		});
+		this.timerToNewPhase('roundIntro');
 	}
 
 	doQuestionSelectIntro(){
