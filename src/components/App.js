@@ -254,6 +254,10 @@ class App extends React.Component {
 			},
 			clueSelection : function(){
 				console.log('clueSelection did begin');
+				const isRoundOver = that.isRoundOver();
+				if (isRoundOver) {
+					that.doRoundOutro();
+				}
 			},
 			cluePresentation : function(){
 				console.log('cluePresentation did begin');
@@ -740,23 +744,6 @@ class App extends React.Component {
 		this.setState({ game: newGame });
 	}
 
-	isRoundOver() {
-		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
-		const game = {...this.state.game};
-		const { cats } = game;
-
-		if (!cats){
-			return false;
-		}
-
-		return Object.keys(cats).some(cat => {
-			const { clues } = cat;
-
-			// if clue.dead === true return false so .some keeps looking
-			return Object.keys(clues).some(clue => clue.dead !== true)
-		})
-
-	}
 	updateScore(uid, delta) {
 		const game = {...this.state.game};
 		const players = {};
