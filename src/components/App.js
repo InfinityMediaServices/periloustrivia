@@ -37,10 +37,6 @@ class App extends React.Component {
 		this.calculateResults      = this.calculateResults.bind(this);
 		this.selectClue            = this.selectClue.bind(this);
 		this.selectQuestion        = this.selectQuestion.bind(this);
-		this.joinGame              = this.joinGame.bind(this);
-		this.startRound            = this.startRound.bind(this);
-		this.startGame             = this.startGame.bind(this);
-		this.isRoundOver           = this.isRoundOver.bind(this);
 		this.setActivePlayer       = this.setActivePlayer.bind(this);
 		this.updateScore           = this.updateScore.bind(this);
 		this.loadPhases            = this.loadPhases.bind(this);
@@ -48,6 +44,11 @@ class App extends React.Component {
 		// User Actions
 		this.buzzIn                = this.buzzIn.bind(this);
 		this.gameOn                = this.gameOn.bind(this);
+		// Game and round changes
+		this.joinGame              = this.joinGame.bind(this);
+		this.startGame             = this.startGame.bind(this);
+		this.startRound            = this.startRound.bind(this);
+		this.isRoundOver           = this.isRoundOver.bind(this);
 		// Intros and Outros
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
