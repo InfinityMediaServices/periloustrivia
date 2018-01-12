@@ -27,6 +27,7 @@ class App extends React.Component {
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
 		// Helpers & Utilities
 		this.getHelperString       = this.getHelperString.bind(this);
+		this.getTickCounts         = this.getTickCounts.bind(this);
 		this.getTickCount          = this.getTickCount.bind(this);
 		this.hasInit               = this.hasInit.bind(this);
 		this.getActiveClue         = this.getActiveClue.bind(this);
@@ -167,16 +168,20 @@ class App extends React.Component {
 		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
-	getTickCount(phase){
-		const game = {...this.state.game};
-		phase = phase || game.phase.name;
-		const counts =  {
+	getTickCounts(){
+		return {
 			buzzIn          : 5,
 			cluePresentation: 3,
 			questionSelect  : 7,
 			results         : 3,
 			scoreAdjustment : 3,
 		};
+	}
+
+	getTickCount(phase){
+		const game = {...this.state.game},
+			counts = this.getTickCounts();
+		phase = phase || game.phase.name;
 		return counts[phase] !== undefined ? counts[phase] : 0;
 	}
 
