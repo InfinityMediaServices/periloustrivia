@@ -170,16 +170,14 @@ class App extends React.Component {
 	getTickCount(phase){
 		const game = {...this.state.game};
 		phase = phase || game.phase.name;
-		return {
-			playerSelect    : 0,
-			clueSelection   : 0,
-			cluePresentation: 3,
+		const counts =  {
 			buzzIn          : 5,
+			cluePresentation: 3,
 			questionSelect  : 7,
 			results         : 3,
 			scoreAdjustment : 3,
-			init            : 0
-		}[phase];
+		};
+		return counts[phase] !== undefined ? counts[phase] : 0;
 	}
 
 	setPhase(phase, callback) {
