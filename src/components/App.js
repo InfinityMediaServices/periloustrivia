@@ -249,37 +249,37 @@ class App extends React.Component {
 		phaseName = phaseName === undefined ? this.state.game.phase.name : phaseName;
 		const that = this;
 		const callbacks = {
-			playerSelect : function(){
-				console.log('playerSelect did begin');
+			buzzIn : function() {
+				console.log('buzzIn did begin');
+				that.timerToNewPhase('results', that.getTickCount('buzzIn'));
 			},
-			clueSelection : function(){
+			cluePresentation : function() {
+				console.log('cluePresentation did begin');
+			},
+			clueSelection : function() {
 				console.log('clueSelection did begin');
 				if (that.isRoundOver()) {
 					that.doRoundOutro();
 				}
 			},
-			cluePresentation : function(){
-				console.log('cluePresentation did begin');
+			init : function() {
+				console.log('init did begin');
 			},
-			buzzIn : function(){
-				console.log('buzzIn did begin');
-				that.timerToNewPhase('results', that.getTickCount('buzzIn'));
+			playerSelect : function() {
+				console.log('playerSelect did begin');
 			},
-			questionSelect : function(){
+			questionSelect : function() {
 				console.log('questionSelect did begin');
 				that.timerToNewPhase('results', that.getTickCount('questionSelect'));
 			},
-			results : function(){
+			results : function() {
 				console.log('results did begin');
 				that.calculateResults();
 				//
 			},
-			scoreAdjustment : function(){
+			scoreAdjustment : function() {
 				console.log('scoreAdjustment did begin');
 			},
-			init : function(){
-				console.log('init did begin');
-			}
 		}
 		if (callbacks[phaseName]) {
 			callbacks[phaseName].call();
