@@ -258,8 +258,12 @@ class App extends React.Component {
 			},
 			clueSelection : function() {
 				console.log('clueSelection did begin');
+				console.log('checking if round is over:');
 				if (that.isRoundOver()) {
+					console.log('Round is over! do outro!');
 					that.doRoundOutro();
+				} else {
+					console.log('Round is not over.');
 				}
 			},
 			init : function() {
