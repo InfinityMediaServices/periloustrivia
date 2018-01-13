@@ -804,7 +804,7 @@ class App extends React.Component {
 			possibleNames,
 		};
 		// in each case, set the helper prop to false
-		possibleNames.map(phaseName => {
+		possibleNames.forEach(phaseName => {
 			game.phase[this.getHelperString(phaseName)] = false;
 		});
 		// set init phase info
