@@ -808,9 +808,9 @@ class App extends React.Component {
 			game.phase[this.getHelperString(phaseName)] = false;
 		});
 		// set init phase info
-		game.phase.isInit = true;
-		game.phase.name =  'init';
-		game.phase.hasInit =  false;
+		game.phase.isInit  = true;
+		game.phase.name    = 'init';
+		game.phase.hasInit = false;
 
 		return game;
 	}
