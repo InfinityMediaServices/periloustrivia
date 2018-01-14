@@ -230,11 +230,11 @@ class App extends React.Component {
 			// PRE GAME
 			'playerSelect',
 			// GAME ON
+			'buzzIn',
+			'cluePresentation',
+			'clueSelection',
 			'gameIntro',
 			'roundIntro',
-			'clueSelection',
-			'cluePresentation',
-			'buzzIn',
 			// 'questionSelectIntro',
 			'questionSelect',
 			'results',
