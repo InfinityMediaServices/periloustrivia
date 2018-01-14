@@ -232,7 +232,6 @@ class App extends React.Component {
 			// GAME ON
 			'gameIntro',
 			'roundIntro',
-			// 'categoryPresentation',
 			'clueSelection',
 			'cluePresentation',
 			'buzzIn',
@@ -240,6 +239,9 @@ class App extends React.Component {
 			'questionSelect',
 			'results',
 			'scoreAdjustment',
+			// Final Round
+			'categoryPresentation',
+			'wager',
 			// system phase
 			'init'
 		];
