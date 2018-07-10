@@ -3,19 +3,55 @@
 
 
 .game-board
-  display flex
-  width 100%
-  .category
-    padding 10px
-    display flex
-    flex-direction column
-    justify-content center
-    align-items center
-    
+	display flex
+	width 100%
+	max-width 50em
+	margin 0 auto
+	.category
+		padding 0
+		display flex
+		flex-direction column
+		justify-content center
+		align-items center
+		flex 1 1 auto
+		.clue,
+		.cat-title
+			position relative
+			width 100%
+			height 0
+			padding-bottom 56.25%
+			.clue-button,
+			.cat-title-inner
+				position absolute
+				width 100%
+				height 100%
+				top 0
+				left 0
+				bottom 0
+				right 0
+				border-color black
+				border-radius 0
+				border-width 1px 0 0 1px
+				border-style solid
+			&:last-child .clue-button
+				border-bottom-width 1px
+		&:last-child
+			.clue-button
+				border-right-width 1px
+		.clue .clue-button
+			background-color rgba(255,255,255,0.5)
+		.cat-title .cat-title-inner
+			background-color rgba(200,200,200,0.5)
+			display flex
+			align-items center
+			justify-content center
+
+
+
 li[class*="answer"]:hover
 	color red
 	cursor pointer
 	&.answer-correct:hover
 		color green
-	
+
 

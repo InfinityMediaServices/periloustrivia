@@ -4,3 +4,4 @@ src/.htaccess
 *.css
 *.zip
 .DS_Store
+*-creds.js

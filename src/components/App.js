@@ -12,41 +12,55 @@ import Timer from './Timer';
 
 class App extends React.Component {
 	constructor() {
+		// Essentials
 		super();
 		this.base                  = base;
-		this.getHelperString       = this.getHelperString.bind(this);
-		this.getTickCount          = this.getTickCount.bind(this);
+		this.state                 = this.state || { game: {} };
+		// Authentication
+		this.authenticate          = this.authenticate.bind(this);
+		this.authHandler           = this.authHandler.bind(this);
+		this.logout                = this.logout.bind(this);
+		// Phases
 		this.setPhase              = this.setPhase.bind(this);
 		this.isPhase               = this.isPhase.bind(this);
+		this.getPhaseNames         = this.getPhaseNames.bind(this);
 		this.phaseDidBegin         = this.phaseDidBegin.bind(this);
-		this.calculateResults      = this.calculateResults.bind(this);
+		// Helpers & Utilities
+		this.getHelperString       = this.getHelperString.bind(this);
+		this.getTickCounts         = this.getTickCounts.bind(this);
+		this.getTickCount          = this.getTickCount.bind(this);
+		this.hasInit               = this.hasInit.bind(this);
 		this.getActiveClue         = this.getActiveClue.bind(this);
 		this.setActiveClue         = this.setActiveClue.bind(this);
-		this.hasInit               = this.hasInit.bind(this);
-		this.selectClue            = this.selectClue.bind(this);
-		this.selectQuestion        = this.selectQuestion.bind(this);
-		this.joinGame              = this.joinGame.bind(this);
-		this.startRound            = this.startRound.bind(this);
-		this.startGame             = this.startGame.bind(this);
-		this.setActivePlayer       = this.setActivePlayer.bind(this);
-		this.isRoundOver           = this.isRoundOver.bind(this);
-		this.updateScore           = this.updateScore.bind(this);
-		this.tick                  = this.tick.bind(this);
-		this.tock                  = this.tock.bind(this);
-		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
-		this.buzzIn                = this.buzzIn.bind(this);
-		this.loadSamples           = this.loadSamples.bind(this);
-		this.authenticate          = this.authenticate.bind(this);
-		this.logout                = this.logout.bind(this);
-		this.authHandler           = this.authHandler.bind(this);
-		this.gameOn                = this.gameOn.bind(this);
 		this.getMe                 = this.getMe.bind(this);
 		this.setMe                 = this.setMe.bind(this);
 		this.isMe                  = this.isMe.bind(this);
+		this.calculateResults      = this.calculateResults.bind(this);
+		this.selectClue            = this.selectClue.bind(this);
+		this.selectQuestion        = this.selectQuestion.bind(this);
+		this.setActivePlayer       = this.setActivePlayer.bind(this);
+		this.updateScore           = this.updateScore.bind(this);
+		this.loadPhases            = this.loadPhases.bind(this);
+		this.loadSamples           = this.loadSamples.bind(this);
+		// User Actions
+		this.buzzIn                = this.buzzIn.bind(this);
+		this.gameOn                = this.gameOn.bind(this);
+		// Game and round changes
+		this.joinGame              = this.joinGame.bind(this);
+		this.startGame             = this.startGame.bind(this);
+		this.startRound            = this.startRound.bind(this);
+		this.endRound              = this.endRound.bind(this);
+		this.isRoundOver           = this.isRoundOver.bind(this);
+		// Intros and Outros
 		this.doGameIntro           = this.doGameIntro.bind(this);
 		this.doRoundIntro          = this.doRoundIntro.bind(this);
+		this.doGameOutro           = this.doGameOutro.bind(this);
+		this.doRoundOutro          = this.doRoundOutro.bind(this);
 		this.doQuestionSelectIntro = this.doQuestionSelectIntro.bind(this);
-		this.state                 = this.state || { game: {} };
+		// Timing
+		this.tick                  = this.tick.bind(this);
+		this.tock                  = this.tock.bind(this);
+		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
 		this.timerDepot            = [];
 	}
 	componentWillMount() {
@@ -85,6 +99,7 @@ class App extends React.Component {
 						if (!data) {
 							if (!this.hasInit(this.state.game)) {
 								let game = this.loadSamples(emptyGame);
+								game = this.loadPhases(game);
 								this.setState({ game: game });
 							}
 						}
@@ -156,19 +171,21 @@ class App extends React.Component {
 		return 'is' + name[0].toUpperCase() + name.slice(1);
 	}
 
-	getTickCount(phase){
-		const game = {...this.state.game};
-		phase = phase || game.phase.name;
+	getTickCounts(){
 		return {
-			playerSelect    : 0,
-			clueSelection   : 0,
-			cluePresentation: 3,
 			buzzIn          : 5,
+			cluePresentation: 3,
 			questionSelect  : 7,
 			results         : 3,
 			scoreAdjustment : 3,
-			init            : 0
-		}[phase];
+		};
+	}
+
+	getTickCount(phase){
+		const game = {...this.state.game},
+			counts = this.getTickCounts();
+		phase = phase || game.phase.name;
+		return counts[phase] !== undefined ? counts[phase] : 0;
 	}
 
 	setPhase(phase, callback) {
@@ -188,7 +205,7 @@ class App extends React.Component {
 		if (callback instanceof Function) {
 			callback.call();
 		}
-		this.phaseDidBegin();
+		this.phaseDidBegin(phase);
 	}
 
 	isPhase(phase) {
@@ -208,40 +225,75 @@ class App extends React.Component {
 		return isIt;
 	}
 
-	phaseDidBegin(){
-		// const game = {...this.state.game};
+	getPhaseNames() {
+		return [
+			// PRE GAME
+			'playerSelect',
+			// GAME ON
+			'buzzIn',
+			'cluePresentation',
+			'clueSelection',
+			'gameIntro',
+			'roundIntro',
+			// 'questionSelectIntro',
+			'questionSelect',
+			'results',
+			'scoreAdjustment',
+			// Final Round
+			'categoryPresentation',
+			'wager',
+			// system phase
+			'init'
+		];
+	}
+
+	phaseDidBegin(phaseName){
+		phaseName = phaseName === undefined ? this.state.game.phase.name : phaseName;
 		const that = this;
 		const callbacks = {
-			playerSelect : function(){
-				console.log('playerSelect did begin');
-			},
-			clueSelection : function(){
-				console.log('clueSelection did begin');
-			},
-			cluePresentation : function(){
-				console.log('cluePresentation did begin');
-			},
-			buzzIn : function(){
+			buzzIn : function() {
 				console.log('buzzIn did begin');
 				that.timerToNewPhase('results', that.getTickCount('buzzIn'));
 			},
-			questionSelect : function(){
+			cluePresentation : function() {
+				console.log('cluePresentation did begin');
+			},
+			clueSelection : function() {
+				console.log('clueSelection did begin');
+				console.log('checking if round is over:');
+				if (that.isRoundOver()) {
+					console.log('Round is over! do outro!');
+					that.doRoundOutro();
+				} else {
+					console.log('Round is not over.');
+				}
+			},
+			init : function() {
+				console.log('init did begin');
+			},
+			playerSelect : function() {
+				console.log('playerSelect did begin');
+			},
+			questionSelect : function() {
 				console.log('questionSelect did begin');
 				that.timerToNewPhase('results', that.getTickCount('questionSelect'));
 			},
-			results : function(){
+			results : function() {
 				console.log('results did begin');
 				that.calculateResults();
 				//
 			},
-			scoreAdjustment : function(){
+			roundIntro : function() {
+				console.log('roundIntro did begin');
+				that.doRoundIntro();
+			},
+			scoreAdjustment : function() {
 				console.log('scoreAdjustment did begin');
 			},
-			init : function(){
-				console.log('init did begin');
-			}
 		}
-		callbacks[this.state.game.phase.name].call();
+		if (callbacks[phaseName]) {
+			callbacks[phaseName].call();
+		}
 
 	}
 
@@ -430,11 +482,9 @@ class App extends React.Component {
 	}
 
 	tick(){
-		console.log('tick');
 		const game = {...this.state.game};
 		const { phase } = game;
 		const timerDepot = this.timerDepot;
-		console.log('timerDepot: ', timerDepot);
 
 		timerDepot.forEach((timer, index) => {
 			console.log(`Running tick on timer index: ${index}`);
@@ -478,7 +528,6 @@ class App extends React.Component {
 		// Clear any previous interval timer for this player
 		// and create a new interval that runs the tick each second
 		const that = this;
-		console.log('tock running');
 		const game = {...this.state.game};
 		console.log('game: ', game);
 		const players = {};
@@ -608,41 +657,83 @@ class App extends React.Component {
 
 	startRound() {}
 
-	startGame() {
+	endRound(leaveOneClueAlive = true) {
+		// helper function for testing
+		console.log('in function "endRound"');
+		// simply set all the questions to dead except one
+		const game = {...this.state.game},
+			newGame = { cats: game.cats },
+			{ cats } = game;
+		let haveSkippedOne = leaveOneClueAlive === true ? false : true;
+		console.log({
+			game,
+			newGame,
+			cats,
+		});
+		if (!cats){
+			return false;
+		}
+		cats.forEach((cat, catIndex) => {
+			const { clues } = cat;
+			clues.forEach((clue, clueIndex) => {
+				console.log(`evaluating cat: ${catIndex} clue: ${clueIndex}`);
+
+				if (clue.dead === true) {
+					console.log('clue dead, moving on.');
+					return
+				}
+				if (!haveSkippedOne) {
+					haveSkippedOne = true;
+					console.log('skipping first live clue.');
+					return;
+				}
+				console.log('killing clue.');
+				newGame.cats[catIndex].clues[clueIndex].dead = true;
+			});
+		});
+		console.log('about to setState');
+		console.log({
+			newGame
+		});
+
+
+		this.setState({
+			game: newGame
+		});
+	}
+
+	isRoundOver() {
+		// Check each clue in `game.cats` and return true if all are dead, false otherwise
 		const game = {...this.state.game};
-		const players = Object.keys(game.players);
+		const { cats } = game;
+
+		if (!cats){
+			return false;
+		}
+		return cats.every(cat => {
+			const { clues } = cat;
+			return clues.every(clue => clue.dead === true);
+		});
+	}
+
+	startGame() {
+		const game = {...this.state.game},
+			newGame = {},
+			players = Object.keys(game.players);
 
 		this.setMe('isReady',  true);
 		this.setMe('score',  0);
-		// check that all users are ready
-		let allGood = players.reduce((allGood, player) => {
-			if (allGood === false) {
-				return false;
-			}
-			if(!game.players[player].isReady){
-				return false;
-			}
-			return allGood;
-		}, true);
-		// are there enough players?
-		if (players.length < 2) {
-			allGood = false;
-		}
+		// check that all users are ready and there are between 2 and 4 players
+		let allGood = players.every(player => game.players[player].isReady === true) && players.length >= 2 && players.length <= 4;
 
 		console.log('allGood: ', allGood);
 		if (allGood) {
 			console.log(`all good setActivePlayer to ${game.owner}`);
-			game.round = 1;
-			game.activePlayer = game.owner;
-			game.phase.name = 'clueSelection';
-			game.phase.isClueSelection = true;
-			this.setState({game}, function(){
-				// has to be set AFTER previous so as to not to collide state objects
-				console.log('state set');
-			});
-				// this.setPhase('clueSelection');
-		} else {
-			// // console.log('waiting on someone');
+			newGame.round = 1;
+			newGame.activePlayer = game.owner;
+			newGame.phase = { name: 'clueSelection' };
+			newGame.phase.isClueSelection = true;
+			this.setState({ game: newGame });
 		}
 	}
 
@@ -658,23 +749,6 @@ class App extends React.Component {
 		this.setState({ game: newGame });
 	}
 
-	isRoundOver() {
-		// Check each clue in `game.cats` and return false if any are not dead and true if all are dead
-		const game = {...this.state.game};
-		const { cats } = game;
-
-		if (!cats){
-			return false;
-		}
-
-		return Object.keys(cats).some(cat => {
-			const { clues } = cat;
-
-			// if clue.dead === true return false so .some keeps looking
-			return Object.keys(clues).some(clue => clue.dead !== true)
-		})
-
-	}
 	updateScore(uid, delta) {
 		const game = {...this.state.game};
 		const players = {};
@@ -724,6 +798,25 @@ class App extends React.Component {
 		return game;
 	}
 
+	loadPhases(game) {
+		// Get all the names of the phases
+		const possibleNames = this.getPhaseNames();
+		// set them in a prop
+		game.phase = {
+			possibleNames,
+		};
+		// in each case, set the helper prop to false
+		possibleNames.forEach(phaseName => {
+			game.phase[this.getHelperString(phaseName)] = false;
+		});
+		// set init phase info
+		game.phase.isInit  = true;
+		game.phase.name    = 'init';
+		game.phase.hasInit = false;
+
+		return game;
+	}
+
 
 	doGameIntro(){
 		this.setPhase('roundIntro');
@@ -731,6 +824,38 @@ class App extends React.Component {
 
 	doRoundIntro(){
 		this.setPhase('clueSelection');
+	}
+
+	doGameOutro(){
+		// this.setPhase('roundOutro');
+	}
+
+	doRoundOutro(){
+		/*
+		 * - get current round number
+		 *     - if it is less than 3 increase it by one
+		 *     - else timer to game outro
+		 * - move `game.rounds[round].cats` into game.cats
+		 * - setState
+		 * - timer to roundIntro
+
+		*/
+		const game = {...this.state.game},
+			newGame = {};
+		let { round } = game;
+
+		if (round >= 3) {
+			this.doGameOutro();
+			return;
+		}
+
+		round += 1;
+		newGame.round = round;
+		newGame.cats = game.rounds[round].cats
+		this.setState({
+			game: newGame
+		});
+		this.timerToNewPhase('roundIntro');
 	}
 
 	doQuestionSelectIntro(){
@@ -809,4 +934,3 @@ App.contextTypes = {
 }
 
 export default App;
-
