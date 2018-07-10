@@ -1,9 +1,6 @@
 import Rebase from 're-base';
+import creds from './base-creds';
 
-const base = Rebase.createClass({
-	apiKey: "AIzaSyD7x5KGwOnZs1eOjHzR_tJb3YbSs1tF0jo",
-	authDomain: "react-perilous-trivia.firebaseapp.com",
-	databaseURL: "https://react-perilous-trivia.firebaseio.com",
-});
+const base = Rebase.createClass(creds);
 
 export default base;
