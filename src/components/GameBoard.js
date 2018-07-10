@@ -14,7 +14,11 @@ class GameBoard extends React.Component {
 		const cat = this.props.game.cats[key];
 		return (
 			<div key={key} className={`category cat cat-${key}`}>
-				<div className="cat-title">{cat.catTitle}</div>
+				<div className="cat-title">
+					<div className="cat-title-inner">
+						<span>{cat.catTitle}</span>
+					</div>
+				</div>
 				{Object.keys(cat.clues).map(clueID => {
 					clueID = parseInt(clueID, 10);
 					return (

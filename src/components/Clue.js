@@ -7,7 +7,7 @@ class Clue extends React.Component {
 			<div className="clue">
 				<button
 					onClick={() => this.props.selectClue(this.props.catID, this.props.clueID)}
-					className={!isDisabled ? "active" : "inactive"}
+					className={"clue-button " + (!isDisabled ? "active" : "inactive")}
 					disabled={isDisabled ? "disabled" : null}
 				>
 					{this.props.difficulty * 100}
