@@ -63,16 +63,26 @@ class App extends React.Component {
 		this.timerToNewPhase       = this.timerToNewPhase.bind(this);
 		this.timerDepot            = [];
 	}
+	// Runs right before the <App> is rendered
 	componentWillMount() {
-		// this runs right before the <App> is rendered
+		// Get the slug for the game from the props.
+		// This is passed in by the router.
 		const slug = this.props.params.gameSlug;
 
+		/*
+		 * Grab the data for the slug from firebase because it contains
+		 * the ID of the game.  Then we can sync the game state with that game
+		 */
 		base.fetch(`slugs/${slug}`, {
 			context: this,
 			then(slugData){
+				// if we get nothing it's a bad URL
+				// TODO: Error handling or 404 here.
 				if (!slugData) { return; }
+				// Set the slugID var to be used elsewhere
 				this.slugID = slugData.id;
-				this.ref = base.syncState(`games/${slugData.id}/game`, {
+				// Sync the state of the game with firebase using `base.syncState`
+				this.ref = base.syncState(`games/${this.slugID}/game`, {
 					context: this,
 					state: 'game'
 				});
@@ -80,14 +90,19 @@ class App extends React.Component {
 		});
 	}
 
+	// If the App unmounts
 	componentWillUnmount() {
-		// // console.log('unmount');
+		// Remove the re-base binding.
+		// It will be re-added if the app is re-mounted
 		base.removeBinding(this.ref);
 	}
 
 	componentDidMount() {
-		// // console.log('component mount');
+		// console.log('component mount');
+
+		// Temp grab dummy data
 		const slug = this.props.params.gameSlug;
+		console.log(this.slugID);
 		base.fetch(`slugs/${slug}`, {
 			context: this,
 			then(slugData){
@@ -95,7 +110,7 @@ class App extends React.Component {
 				base.fetch(`games/${slugData.id}/game`, {
 					context: this,
 					then(data) {
-						// // console.log('base fetch');
+						// console.log('base fetch');
 						if (!data) {
 							if (!this.hasInit(this.state.game)) {
 								let game = this.loadSamples(emptyGame);
@@ -107,13 +122,15 @@ class App extends React.Component {
 				});
 			}
 		});
+
+		// Authenticate the user on app mount.
 		base.onAuth((user) => {
-			// // console.log('on Auth');
+			// console.log('on Auth');
 			if(user) {
 				this.authHandler(null, { user });
 			}
 		});
-		console.log('this.setState: ', this.setState);
+
 		this.tock();
 	}
 
@@ -121,7 +138,7 @@ class App extends React.Component {
 	addUserToGame = false;
 
 	authenticate(provider) {
-		// // // console.log(`Trying to log in with ${provider}`);
+		// console.log(`Trying to log in with ${provider}`);
 		base.authWithOAuthPopup(provider, this.authHandler);
 	}
 
@@ -140,7 +157,7 @@ class App extends React.Component {
 	}
 
 	authHandler(err, authData)  {
-		// // // console.log('authData: ', authData);
+		// console.log('authData: ', authData);
 		if (err) {
 			console.error(err);
 			return;
@@ -216,7 +233,7 @@ class App extends React.Component {
 		} else {
 			const name = game.phase.name;
 			// const prop = game.phase['is' + name[0].toUpperCase() + name.slice(1)];
-			// // // console.log('prop: ', prop);
+			// console.log('prop: ', prop);
 			// isIt = game.phase[prop];
 			isIt = name === phase;
 			// // console.log(game.phase, isIt);
@@ -482,6 +499,7 @@ class App extends React.Component {
 	}
 
 	tick(){
+		console.log('tick');
 		const game = {...this.state.game};
 		const { phase } = game;
 		const timerDepot = this.timerDepot;
@@ -525,6 +543,7 @@ class App extends React.Component {
 	}
 
 	tock() {
+		console.log('tock');
 		// Clear any previous interval timer for this player
 		// and create a new interval that runs the tick each second
 		const that = this;
