@@ -65,17 +65,28 @@ class App extends React.Component {
     this.timerToNewPhase = this.timerToNewPhase.bind(this);
     this.timerDepot = [];
   }
+
+  // Runs right before the <App> is rendered
   componentWillMount() {
-    // this runs right before the <App> is rendered
+    // Get the slug for the game from the props.
+    // This is passed in by the router.
     const slug = this.props.params.gameSlug;
 
+    /*
+     * Grab the data for the slug from firebase because it contains
+     * the ID of the game.  Then we can sync the game state with that game
+     */
     base.fetch(`slugs/${slug}`, {
       context: this,
       then(slugData) {
+        // if we get nothing it's a bad URL
+        // TODO: Error handling or 404 here.
         if (!slugData) {
           return;
         }
+        // Set the slugID var to be used elsewhere
         this.slugID = slugData.id;
+        // Sync the state of the game with firebase using `base.syncState`
         this.ref = base.syncState(`games/${slugData.id}/game`, {
           context: this,
           state: 'game'
@@ -84,13 +95,15 @@ class App extends React.Component {
     });
   }
 
+  // If the App unmounts
   componentWillUnmount() {
-    // // console.log('unmount');
+    // Remove the re-base binding.
+    // It will be re-added if the app is re-mounted
     base.removeBinding(this.ref);
   }
 
   componentDidMount() {
-    // // console.log('component mount');
+    // Temp grab dummy data
     const slug = this.props.params.gameSlug;
     base.fetch(`slugs/${slug}`, {
       context: this,
@@ -101,7 +114,7 @@ class App extends React.Component {
         base.fetch(`games/${slugData.id}/game`, {
           context: this,
           then(data) {
-            // // console.log('base fetch');
+            // console.log('base fetch');
             if (!data) {
               if (!this.hasInit(this.state.game)) {
                 let game = this.loadSamples(emptyGame);
@@ -115,15 +128,17 @@ class App extends React.Component {
         });
       }
     });
+
+    // Authenticate the user on app mount.
     base.onAuth((user) => {
-      // // console.log('on Auth');
+      // console.log('on Auth');
       if (user) {
         this.authHandler(null, {
           user
         });
       }
     });
-    console.log('this.setState: ', this.setState);
+
     this.tock();
   }
 
@@ -131,7 +146,7 @@ class App extends React.Component {
   addUserToGame = false;
 
   authenticate(provider) {
-    // // // console.log(`Trying to log in with ${provider}`);
+    // console.log(`Trying to log in with ${provider}`);
     base.authWithOAuthPopup(provider, this.authHandler);
   }
 
@@ -139,9 +154,9 @@ class App extends React.Component {
     const game = { ...this.state.game
     };
     const uid = this.state.uid;
-    // // console.log('game before delete: ', game);
+    // console.log('game before delete: ', game);
     game.players[uid] = null;
-    // // console.log('game after delete: ', game);
+    // console.log('game after delete: ', game);
     this.setState({
       game: game,
       uid: null,
@@ -151,7 +166,7 @@ class App extends React.Component {
   }
 
   authHandler(err, authData) {
-    // // // console.log('authData: ', authData);
+    // console.log('authData: ', authData);
     if (err) {
       console.error(err);
       return;
@@ -235,12 +250,12 @@ class App extends React.Component {
     } else {
       const name = game.phase.name;
       // const prop = game.phase['is' + name[0].toUpperCase() + name.slice(1)];
-      // // // console.log('prop: ', prop);
+      // console.log('prop: ', prop);
       // isIt = game.phase[prop];
       isIt = name === phase;
-      // // console.log(game.phase, isIt);
+      // console.log(game.phase, isIt);
     }
-    // // console.log('checking isPhase: ', phase);
+    // console.log('checking isPhase: ', phase);
     return isIt;
   }
 
@@ -411,8 +426,8 @@ class App extends React.Component {
 
   hasInit(game) {
     game = game || this.state.game || {};
-    // // console.log('hasInit');
-    // // console.log('this.state.game: ', this.state.game);
+    // console.log('hasInit');
+    // console.log('this.state.game: ', this.state.game);
     if (!this.state.game || !this.state.game.phase) {
       return false;
     }
@@ -836,8 +851,8 @@ class App extends React.Component {
   }
 
   loadSamples(game) {
-    // // console.log('Load Samples');
-    // // console.log('game: ', game);
+    // console.log('Load Samples');
+    // console.log('game: ', game);
     // const game = this.state.game;
     const clues = sampleClues;
     // game.rounds = emptyGame.rounds;
@@ -868,7 +883,7 @@ class App extends React.Component {
     }
     game.owner = this.state.uid;
 
-    // // console.log('game at fn end: ', game);
+    // console.log('game at fn end: ', game);
     return game;
   }
 
@@ -942,7 +957,7 @@ class App extends React.Component {
 
   render() {
     let me = {};
-    // // console.log('this.state.game: ', this.state.game);
+    // console.log('this.state.game: ', this.state.game);
 
     if (this.state.uid && this.state.game && this.state.game.players && this.state.game.players[this.state.uid]) {
       me = this.getMe();
