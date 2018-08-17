@@ -1,12 +1,11 @@
 {
   "name": "perilous-trivia",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "private": true,
   "devDependencies": {
     "autoprefixer-stylus": "0.10.0",
     "concurrently": "3.0.0",
     "hashids": "1.1.1",
-    "react-scripts": "0.6.1",
     "stylus": "0.54.5"
   },
   "dependencies": {
@@ -15,7 +14,8 @@
     "react": "15.3.2",
     "react-addons-css-transition-group": "15.3.2",
     "react-dom": "15.3.2",
-    "react-router": "4.0.0-alpha.4"
+    "react-router": "4.0.0-alpha.4",
+    "react-scripts": "^1.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -27,5 +27,20 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  }
+  },
+  "description": "A cool React app that uses firebase to make a multi-player trivia game that might remind you of a TV show.",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infn8/periloustrivia.git"
+  },
+  "keywords": [
+    "trivia",
+    "game"
+  ],
+  "author": "Arron Gibson",
+  "bugs": {
+    "url": "https://github.com/infn8/periloustrivia/issues"
+  },
+  "homepage": "https://github.com/infn8/periloustrivia#readme"
 }
