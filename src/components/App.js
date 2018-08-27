@@ -66,6 +66,8 @@ class App extends React.Component {
     this.tock = this.tock.bind(this);
     this.timerToNewPhase = this.timerToNewPhase.bind(this);
     this.timerDepot = [];
+    // in case the game is created before the auth callback
+    this.addUserToGame = false;
   }
   componentWillMount() {
     // this runs right before the <App> is rendered
@@ -126,19 +128,11 @@ class App extends React.Component {
       }
     });
 
-
     console.log('this.setState: ', this.setState);
     this.tock();
   }
 
-  // in case the game is created before the auth callback
-  addUserToGame = false;
-
   authenticate(providerName) {
-
-
-
-
 
     // Using a popup.
     var provider = new firebase.auth.GoogleAuthProvider();
@@ -150,8 +144,6 @@ class App extends React.Component {
       // var token = result.credential.accessToken;
       // // The signed-in user info.
       // var user = result.user;
-
-
 
     // base.authWithOAuthPopup(provider, this.authHandler);
   }
@@ -197,8 +189,6 @@ class App extends React.Component {
       this.addUserToGame = false;
     }
   }
-
-
 
   getHelperString(name) {
     return 'is' + name[0].toUpperCase() + name.slice(1);
@@ -423,9 +413,6 @@ class App extends React.Component {
     this.setActiveClue(clue);
     this.timerToNewPhase(newPhase, this.getTickCount('results'));
 
-
-
-
   }
 
   hasInit(game) {
@@ -509,10 +496,6 @@ class App extends React.Component {
     // calculate and apply
     // timeout to either buzz in or clue selection
 
-
-
-
-
     this.setState({
       game: {
         cats: game.cats
@@ -520,7 +503,6 @@ class App extends React.Component {
     });
 
     this.setPhase('results');
-
 
     // let newGame = {};
     // newGame.cats = [];
@@ -700,8 +682,6 @@ class App extends React.Component {
         //handle error
       })
 
-
-
     }).catch(err => {
       // handle error
     });
@@ -771,7 +751,6 @@ class App extends React.Component {
     console.log({
       newGame
     });
-
 
     this.setState({
       game: newGame
@@ -910,7 +889,6 @@ class App extends React.Component {
     return game;
   }
 
-
   doGameIntro() {
     this.setPhase('roundIntro');
   }
@@ -957,7 +935,6 @@ class App extends React.Component {
   doQuestionSelectIntro() {
     this.setPhase('questionSelect');
   }
-
 
   render() {
     let me = {};

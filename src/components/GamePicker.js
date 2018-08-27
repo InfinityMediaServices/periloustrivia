@@ -76,6 +76,7 @@ class GamePicker extends React.Component {
 
 	createGame(owner){
 		// return authData;
+    // console.log({owner});
 		const gameData = {
 			players: {
 				[owner.uid] : {
@@ -92,6 +93,7 @@ class GamePicker extends React.Component {
 		base.push('games', {
 			data: gameData
 		}).then(data => {
+      console.log({data});
 			const slugRef = firebase.database().ref('slugs');
 			const gameID = data.key;
 			// TODO: fix to promise approach here
