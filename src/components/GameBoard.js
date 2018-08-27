@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Clue from './Clue';
 
 class GameBoard extends React.Component {
@@ -60,11 +61,11 @@ class GameBoard extends React.Component {
 }
 
 GameBoard.propTypes = {
-	game: React.PropTypes.object.isRequired,
-	me: React.PropTypes.object.isRequired,
-	selectClue: React.PropTypes.func.isRequired,
-	gameOn: React.PropTypes.func.isRequired,
-	isPhase: React.PropTypes.func.isRequired,
+	game: PropTypes.object.isRequired,
+	me: PropTypes.object.isRequired,
+	selectClue: PropTypes.func.isRequired,
+	gameOn: PropTypes.func.isRequired,
+	isPhase: PropTypes.func.isRequired,
 };
 
 export default GameBoard;

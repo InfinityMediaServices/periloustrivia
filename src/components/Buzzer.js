@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class Buzzer extends React.Component {
   render() {
@@ -28,10 +29,10 @@ class Buzzer extends React.Component {
 }
 
 Buzzer.propTypes = {
-	game: React.PropTypes.object.isRequired,
-	me: React.PropTypes.object.isRequired,
-	isPhase: React.PropTypes.func.isRequired,
-	buzzIn: React.PropTypes.func.isRequired,
+	game: PropTypes.object.isRequired,
+	me: PropTypes.object.isRequired,
+	isPhase: PropTypes.func.isRequired,
+	buzzIn: PropTypes.func.isRequired,
 };
 
 export default Buzzer;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class ScoreBoard extends React.Component {
 
@@ -132,13 +133,13 @@ class ScoreBoard extends React.Component {
 }
 
 ScoreBoard.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: PropTypes.object.isRequired
 }
 
 ScoreBoard.propTypes = {
-	game: React.PropTypes.object.isRequired,
-	me: React.PropTypes.object.isRequired,
-	joinGame: React.PropTypes.func.isRequired,
+	game: PropTypes.object.isRequired,
+	me: PropTypes.object.isRequired,
+	joinGame: PropTypes.func.isRequired,
 };
 
 export default ScoreBoard;

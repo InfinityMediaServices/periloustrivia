@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class PlayBoard extends React.Component {
 
@@ -74,8 +75,8 @@ class PlayBoard extends React.Component {
 }
 
 PlayBoard.propTypes = {
-	game: React.PropTypes.object.isRequired,
-	me: React.PropTypes.object.isRequired,
+	game: PropTypes.object.isRequired,
+	me: PropTypes.object.isRequired,
 };
 
 export default PlayBoard;

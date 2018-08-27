@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class Clue extends React.Component {
 	render() {
@@ -16,12 +17,12 @@ class Clue extends React.Component {
 		)
 	}
 	static propTypes = {
-		catID: React.PropTypes.number.isRequired, // {key}
-		clueID: React.PropTypes.number.isRequired, // {clueID}
-		clue: React.PropTypes.object.isRequired, // {cat.clues[clueID].clue}
-		difficulty: React.PropTypes.number.isRequired, // {parseInt(clueID, 10)}
-		selectClue: React.PropTypes.func.isRequired, // {this.props.selectClue}
-		active: React.PropTypes.bool.isRequired, // {this.props.selectClue}
+		catID: PropTypes.number.isRequired, // {key}
+		clueID: PropTypes.number.isRequired, // {clueID}
+		clue: PropTypes.object.isRequired, // {cat.clues[clueID].clue}
+		difficulty: PropTypes.number.isRequired, // {parseInt(clueID, 10)}
+		selectClue: PropTypes.func.isRequired, // {this.props.selectClue}
+		active: PropTypes.bool.isRequired, // {this.props.selectClue}
 	};
 }
 

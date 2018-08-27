@@ -1,5 +1,6 @@
 import React from 'react';
 import base from '../base';
+import PropTypes from 'prop-types';
 import Hashids  from 'hashids';
 
 const hashids = new Hashids(
@@ -144,6 +145,6 @@ class GamePicker extends React.Component {
 	}
 }
 GamePicker.contextTypes = {
-	router: React.PropTypes.object.isRequired
+	router: PropTypes.object.isRequired
 }
 export default GamePicker;

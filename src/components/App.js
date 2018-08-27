@@ -1,5 +1,6 @@
 import React from 'react';
 import base from '../base';
+import PropTypes from 'prop-types';
 
 import GameBoard from './GameBoard';
 import PlayBoard from './PlayBoard';
@@ -1060,7 +1061,7 @@ class App extends React.Component {
 }
 
 App.contextTypes = {
-  router: React.PropTypes.object.isRequired
+  router: PropTypes.object.isRequired
 }
 
 export default App;
