@@ -1,6 +1,7 @@
 import React from 'react';
-import base from '../base';
 import PropTypes from 'prop-types';
+import { firebaseApp, base } from '../base';
+import firebase from 'firebase';
 import Hashids  from 'hashids';
 
 const hashids = new Hashids(
@@ -25,11 +26,11 @@ class GamePicker extends React.Component {
 	}
 
 	componentDidMount() {
-		base.onAuth((user) => {
-			if(user) {
-				this.authHandler(null, { user });
-			}
-		});
+    firebaseApp.auth().onAuthStateChanged(user => {
+      if(user) {
+        this.authHandler({ user });
+      }
+    });
 	}
 
 	goToGame(event) {
@@ -42,17 +43,24 @@ class GamePicker extends React.Component {
 		this.context.router.transitionTo(`/game/${gameId}`);
 	}
 
-	authenticate(provider) {
-		// // console.log(`Trying to log in with ${provider}`);
-		base.authWithOAuthPopup(provider, this.authHandler);
+	authenticate(providerName) {
+
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    firebase.auth().signInWithPopup(provider).then(this.authHandler);
+
+
+
+
 	}
 
 	logout() {
-		base.unauth();
+		firebaseApp.auth().signOut();
 		this.setState({ uid: null });
 	}
 
-	authHandler(err, authData)  {
+	authHandler(authData, err)  {
 		// // console.log('authData: ', authData);
 		if (err) {
 			console.error(err);
@@ -84,7 +92,7 @@ class GamePicker extends React.Component {
 		base.push('games', {
 			data: gameData
 		}).then(data => {
-			const slugRef = base.database().ref('slugs');
+			const slugRef = firebase.database().ref('slugs');
 			const gameID = data.key;
 			// TODO: fix to promise approach here
 			slugRef.once('value', (snapshot) => {

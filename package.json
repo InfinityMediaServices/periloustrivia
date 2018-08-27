@@ -3,19 +3,21 @@
   "version": "0.2.0",
   "private": true,
   "devDependencies": {
-    "autoprefixer-stylus": "0.10.0",
-    "concurrently": "3.0.0",
-    "hashids": "1.1.1",
+    "autoprefixer-stylus": "0.14.0",
+    "concurrently": "3.6.1",
+    "firebase": "^5.4.1",
+    "hashids": "1.1.4",
+    "react-router-dom": "^4.3.1",
     "stylus": "0.54.5"
   },
   "dependencies": {
-    "history": "4.2.0",
-    "re-base": "2.2.0",
-    "react": "15.3.2",
-    "react-addons-css-transition-group": "15.3.2",
-    "react-dom": "15.3.2",
-    "react-router": "4.0.0-alpha.4",
+    "history": "4.7.2",
     "prop-types": "^15.6.2",
+    "re-base": "4.0.0",
+    "react": "16.4.2",
+    "react-addons-css-transition-group": "15.6.2",
+    "react-dom": "16.4.2",
+    "react-router": "4.3.1",
     "react-scripts": "^1.1.4"
   },
   "scripts": {

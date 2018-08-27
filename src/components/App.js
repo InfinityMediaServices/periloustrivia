@@ -1,6 +1,7 @@
 import React from 'react';
-import base from '../base';
 import PropTypes from 'prop-types';
+import { firebaseApp, base } from '../base';
+import firebase from 'firebase';
 
 import GameBoard from './GameBoard';
 import PlayBoard from './PlayBoard';
@@ -116,14 +117,16 @@ class App extends React.Component {
         });
       }
     });
-    base.onAuth((user) => {
-      // // console.log('on Auth');
+
+    firebaseApp.auth().onAuthStateChanged(function(user, error) {
       if (user) {
-        this.authHandler(null, {
+        this.authHandler({
           user
         });
       }
     });
+
+
     console.log('this.setState: ', this.setState);
     this.tock();
   }
@@ -131,14 +134,30 @@ class App extends React.Component {
   // in case the game is created before the auth callback
   addUserToGame = false;
 
-  authenticate(provider) {
-    // // // console.log(`Trying to log in with ${provider}`);
-    base.authWithOAuthPopup(provider, this.authHandler);
+  authenticate(providerName) {
+
+
+
+
+
+    // Using a popup.
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    firebase.auth().signInWithPopup(provider).then(this.authHandler);
+
+      // // This gives you a Google Access Token.
+      // var token = result.credential.accessToken;
+      // // The signed-in user info.
+      // var user = result.user;
+
+
+
+    // base.authWithOAuthPopup(provider, this.authHandler);
   }
 
   logout() {
-    const game = { ...this.state.game
-    };
+    const game = { ...this.state.game };
     const uid = this.state.uid;
     // // console.log('game before delete: ', game);
     game.players[uid] = null;
@@ -151,13 +170,12 @@ class App extends React.Component {
     base.unauth();
   }
 
-  authHandler(err, authData) {
-    // // // console.log('authData: ', authData);
+  authHandler(authData, err) {
     if (err) {
       console.error(err);
       return;
     }
-    // this.createGame(authData.user);
+    console.log({authData});
 
     this.setState({
       uid: authData.user.uid,
